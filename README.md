@@ -10,17 +10,19 @@
 
 | 你的设备 | 使用入口 |
 | --- | --- |
-| 安卓手机、电脑 | [下载通用版 index.html](https://github.com/Riiiiiii/cp-offline-shopping-assistant/raw/refs/heads/main/index.html) |
+| 安卓手机、电脑 | [下载通用版（单个 HTML 文件）](https://riiiiiii.github.io/cp-offline-shopping-assistant/index.html?download=1) |
 | iPhone、iPad | [用 Safari 打开 iOS 版](https://riiiiiii.github.io/cp-offline-shopping-assistant/index_ios.html) |
 
 ### 安卓手机和电脑
 
-1. 下载上方的 `index.html`，保存到设备中。
+1. 打开上方下载入口，再点击「下载通用版 index.html」，保存到设备中。
 2. 用 Chrome、Edge 等浏览器打开这个文件。
 3. 点击底部「添加 / 导入」，导入 CPP 导出的 Excel 心愿单，或手动添加条目。
 4. 返回「地图」或「清单」即可开始使用。之后断网也能打开这个 HTML 文件。
 
-如果打开后只有预览、按钮无法点击，请选择“用浏览器打开”。正式使用后尽量保留同一个文件位置和浏览器，更换前先导出备份，**出发前建议先备份.json格式文件**（具体方法见后文）。
+如果在微信、QQ 等 App 内点击后没有下载，请选择“在浏览器中打开”后重试，也可以长按下载按钮选择“下载链接 / 链接另存为”。保存的文件名应以 `.html` 结尾。
+
+如果打开已下载的文件后只有预览、按钮无法点击，请选择“用浏览器打开”。正式使用后尽量保留同一个文件位置和浏览器，更换前先导出备份，**出发前建议先备份.json格式文件**（具体方法见后文）。
 
 ### iPhone 和 iPad
 
@@ -120,6 +122,10 @@ Safari 网页与主屏幕应用可能分别保存数据，因此请先安装到�
 
 
 ## 常见问题
+
+### 点击下载后，为什么只看到代码？
+
+旧的 GitHub Raw 链接可能会直接显示 HTML 源码。请回到上方下载入口，再点击页面中的「下载通用版 index.html」保存文件。
 
 ### Excel 导入失败怎么办？
 

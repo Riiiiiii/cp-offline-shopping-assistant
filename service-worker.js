@@ -1,12 +1,12 @@
 const CACHE_PREFIX = 'cp-offline-shopping-assistant-' + self.registration.scope + '-';
-const CACHE_NAME = `${CACHE_PREFIX}ios-pwa-v16-cptf`;
+const CACHE_NAME = `${CACHE_PREFIX}ios-pwa-v17-cptf-wave`;
 const APP_SHELL = [
   './index_ios.html',
-  './manifest.webmanifest',
-  './icons/apple-touch-icon.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-512.png'
+  './manifest.webmanifest?v=wave-1',
+  './icons/apple-touch-icon.png?v=wave-1',
+  './icons/icon-192.png?v=wave-1',
+  './icons/icon-512.png?v=wave-1',
+  './icons/icon-maskable-512.png?v=wave-1'
 ];
 const IOS_ENTRY_PATH = new URL('./index_ios.html', self.registration.scope).pathname;
 const APP_SHELL_PATHS = new Set(

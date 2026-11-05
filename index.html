@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes" />
 <meta name="theme-color" content="#f7f8fa" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2036%2036%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Crect%20width%3D%2236%22%20height%3D%2236%22%20fill%3D%22white%22%2F%3E%3Cg%20transform%3D%22translate(6%206)%22%20fill%3D%22none%22%20stroke%3D%22%23257dab%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%206c3-4%207%204%2010%200s7%204%2010%200M2%2012c3-4%207%204%2010%200s7%204%2010%200M2%2018c3-4%207%204%2010%200s7%204%2010%200%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" />
 <title>CPT-F 离线购物助手 V2</title>
 <style>
 :root{
@@ -166,10 +167,15 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 .horizontal-track{border-top:6px solid #b8bec7;border-radius:4px}
 
 
-.import-warning-dialog{width:calc(100% - 32px);max-width:440px;max-height:80dvh;overflow:auto;padding:22px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--text);box-shadow:0 12px 44px rgba(0,0,0,.18)}
-.import-warning-dialog::backdrop{background:rgba(0,0,0,.35)}
-.import-warning-dialog h2{font-size:18px;margin:0 0 10px}.import-warning-dialog p{font-size:13px;line-height:1.6;color:var(--muted);margin:0}
+.import-warning-dialog,.download-dialog{width:calc(100% - 32px);max-width:440px;max-height:80dvh;overflow:auto;padding:22px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--text);box-shadow:0 12px 44px rgba(0,0,0,.18)}
+.import-warning-dialog::backdrop,.download-dialog::backdrop{background:rgba(0,0,0,.35)}
+.import-warning-dialog h2,.download-dialog h2{font-size:18px;margin:0 0 10px}.import-warning-dialog p,.download-dialog p{font-size:13px;line-height:1.6;color:var(--muted);margin:0}
 .import-warning-dialog ul{margin:16px 0;padding-left:24px;font-size:14px;line-height:1.9;overflow-wrap:anywhere}
+.download-dialog .sheet-head{align-items:center}.download-dialog h2{margin:0}
+.download-dialog ol{margin:16px 0;padding-left:22px;font-size:14px;line-height:1.8}
+.download-file-button{display:flex;align-items:center;justify-content:center;min-height:48px;margin:18px 0 14px;padding:12px;border-radius:11px;background:#257dab;color:#fff;font-weight:800;text-decoration:none}
+.download-file-button:hover{background:#1d668d}.download-file-button:focus-visible{outline:3px solid #7d93af;outline-offset:3px}
+.download-dialog .download-ios-link{display:inline-block;margin-top:14px;color:#257dab;font-size:13px}
 .facility-zone.exhibition span{white-space:nowrap}.facility-zone.exhibition .navigation-status{font-size:8px;white-space:nowrap}
 
 </style>
@@ -675,6 +681,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   </section>
 </div>
 <div class="sheet-backdrop" id="sheetBackdrop"><div class="sheet" id="sheet"><div class="grab"></div><div id="sheetContent"></div></div></div>
+<dialog id="downloadDialog" class="download-dialog" aria-labelledby="downloadTitle" aria-describedby="downloadDescription">
+  <div class="sheet-head"><h2 id="downloadTitle">下载通用版</h2><form method="dialog"><button type="submit" class="close" aria-label="关闭下载提示">×</button></form></div>
+  <p id="downloadDescription">适用于安卓手机和电脑。只需保存一个 HTML 文件，无需安装。</p>
+  <ol><li>点击下方按钮，将 <strong>index.html</strong> 保存到设备。</li><li>在下载记录或文件管理中找到它，用浏览器打开，之后断网也能使用。</li></ol>
+  <a id="downloadHtmlLink" class="download-file-button" href="./index.html" download="index.html" autofocus>下载通用版 index.html</a>
+  <p>如果没有开始下载，请用 Chrome、Edge 等浏览器打开本页后重试，或长按下载按钮选择「下载链接」。</p>
+  <a class="download-ios-link" href="./index_ios.html">iPhone / iPad：用 Safari 打开 iOS 版</a>
+</dialog>
 <dialog id="importWarningDialog" class="import-warning-dialog" aria-labelledby="importWarningTitle" aria-describedby="importWarningDescription">
   <h2 id="importWarningTitle">部分摊位号未匹配地图</h2>
   <p id="importWarningDescription">这些条目已导入清单，但暂时无法在地图上定位。请核对摊位号和所属场次。</p>
@@ -2256,6 +2270,7 @@ function showUnmappedImportWarning(rows){
 document.getElementById('excelInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const rows=await readWishlistWorkbook(f);const r=mergeImported(rows);renderMap();renderList();toast(`导入完成：新增 ${r.added}，更新 ${r.updated}`);showUnmappedImportWarning(rows)}catch(err){console.error(err);toast(err.message==='legacy-xls'?'这是旧式二进制 .xls，当前版本暂不支持':'Excel 读取失败，请检查表头和文件格式')}e.target.value=''};
 
 applyFreebieOpacity(state.freebieOpacity);applyMarkerOpacity(state.markerOpacity);renderStats();renderHallTabs();renderMap();
+if(/^https?:$/.test(location.protocol)&&new URLSearchParams(location.search).get('download')==='1')document.getElementById('downloadDialog').showModal();
 </script>
 </body>
 </html>
