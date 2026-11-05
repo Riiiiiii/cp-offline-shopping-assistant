@@ -1,0 +1,15 @@
+
+.DS_Store
+
+# Personal wishlist exports and backups stay local.
+心愿单*.xls
+心愿单*.xlsx
+*_wishlist_backup.json
+
+# Local notes, not included in the published repository.
+/CHANGELOG.md
+/docs/MAINTENANCE.md
+
+# Development resources stay local.
+/assets/
+/tests/

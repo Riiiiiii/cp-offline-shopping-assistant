@@ -1,0 +1,2261 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes" />
+<meta name="theme-color" content="#f7f8fa" />
+<title>CPT-F 离线购物助手 V2</title>
+<style>
+:root{
+  --bg:#f5f6f8;--card:#fff;--text:#15171a;--muted:#69707a;--line:#d9dde3;
+  --pending:#35a85b;--done:#3f79d6;--sold:#8c9199;--danger:#c84949;--accent:#222;
+  --safe-bottom:max(12px,env(safe-area-inset-bottom));--marker-opacity:.8;
+}
+*{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+.lucide-sprite{position:absolute;width:0;height:0;overflow:hidden}.lucide-icon{display:inline-block;width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.14em;pointer-events:none}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+.app{max-width:820px;margin:0 auto;min-height:100vh;padding-bottom:calc(76px + var(--safe-bottom))}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(245,246,248,.94);backdrop-filter:blur(16px);padding:10px 14px 8px;border-bottom:1px solid rgba(0,0,0,.06)}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px}.title{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:18px}.title-star{width:18px;height:18px;fill:currentColor;stroke-width:1.7}.badge{font-size:12px;font-weight:750;color:#343a42;border:1px solid var(--line);border-radius:999px;padding:5px 10px;background:#fff}.badge:hover,.badge:focus-visible,.badge:active{border-color:#9ca7b5;background:#f4f6f8;outline:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}.stat{background:#fff;border:1px solid #e4e6ea;border-radius:12px;padding:8px 9px;min-width:0}.stat b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stat span{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+.content{padding:12px 12px 20px}.view{display:none}.view.active{display:block}
+.card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.hall-tabs{display:flex;gap:7px;overflow:auto;padding:1px 1px 9px;scrollbar-width:none}.hall-tabs::-webkit-scrollbar{display:none}.hall-tab{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:11px;min-width:49px;height:42px;font-weight:700}.hall-tab.active{background:#17191c;color:#fff;border-color:#17191c}
+.hall-head{padding:13px 14px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.hall-head h2{font-size:18px;margin:0 0 3px}.sub{font-size:12px;color:var(--muted);line-height:1.45}.hall-progress{font-size:12px;text-align:right;white-space:nowrap}.hall-progress strong{font-size:15px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;padding:0 14px 12px;font-size:12px;color:var(--muted)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.dot.pending{background:var(--pending)}.dot.done{background:var(--done)}.dot.gray{background:#aeb4bd}
+.map-note{margin:0 14px 10px;padding:9px 10px;border-radius:11px;background:#f6f7f9;color:var(--muted);font-size:12px}
+.aisle-end-label{position:absolute;z-index:2;padding:1px 3px;border-radius:4px;background:rgba(250,251,252,.94);color:#737b86;font-size:8px;font-weight:750;line-height:1.35;white-space:nowrap;pointer-events:none}.aisle-end-label.left{right:calc(50% + 7px)}.aisle-end-label.right{left:calc(50% + 7px)}.aisle-end-label.head{top:28px}.aisle-end-label.tail{bottom:14px}
+.block-wrap{padding:0 10px 12px}.block-title{font-size:12px;color:var(--muted);font-weight:700;padding:2px 2px 7px}.block-scroll{overflow-x:auto;overscroll-behavior-x:contain;border:1px solid #e7e9ed;border-radius:13px;background:#fafbfc}.aisles{display:flex;gap:10px;min-height:314px;padding:14px 58px 12px;width:max-content}.aisle{width:62px;height:286px;position:relative;flex:0 0 62px}.aisle-letter{position:absolute;top:0;left:0;right:0;text-align:center;font-weight:800;font-size:15px}.aisle-line{position:absolute;top:30px;bottom:17px;left:50%;width:8px;transform:translateX(-50%);background:#b8bec7;border-radius:8px}.aisle-side-label{position:absolute;top:31px;font-size:8px;color:#9298a1;writing-mode:horizontal-tb}.aisle-side-label.left{left:15px}.aisle-side-label.right{right:13px}.map-marker{position:absolute;z-index:5;border:0;border-radius:9px;padding:4px 6px;min-width:48px;max-width:72px;font-size:10px;font-weight:800;line-height:1.1;box-shadow:0 2px 8px rgba(0,0,0,.16);color:#fff;transform:translateY(-50%)}.map-marker.side-left{right:34px}.map-marker.side-right{left:34px}.map-marker.pending{background:var(--pending)}.map-marker.done{background:var(--done)}.map-marker small{display:block;font-weight:600;opacity:.88;font-size:8px;margin-top:2px}.marker-range{outline:2px solid rgba(255,255,255,.6)}
+.special-zone{margin:0 10px 12px;border:1px solid #e7e9ed;border-radius:13px;background:#fafbfc;padding:12px}.special-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.special-head b{font-size:13px}.special-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.special-booth{border:0;border-radius:10px;padding:9px 5px;color:#fff;font-weight:800;font-size:11px}.special-booth.pending{background:var(--pending)}.special-booth.done{background:var(--done)}.special-placeholder{border:1px dashed #cbd0d7;border-radius:10px;padding:9px 5px;color:#9aa0a8;text-align:center;font-size:11px}
+.empty-hall{margin:0 10px 12px;padding:13px;border:1px dashed #ccd1d8;border-radius:12px;text-align:center;font-size:12px;color:var(--muted)}
+.toolbar{display:flex;gap:8px;margin-bottom:10px}.search{flex:1;min-width:0;height:43px;border:1px solid var(--line);border-radius:12px;padding:0 12px;background:#fff}.filter{height:43px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 8px}
+.booth-list{display:grid;gap:10px}.booth-card{padding:0;overflow:hidden}.booth-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;border-bottom:1px solid #edf0f3}.booth-id{display:flex;align-items:center;gap:8px;font-weight:850}.status-pill{width:10px;height:10px;border-radius:50%;flex:none}.status-pill.pending{background:var(--pending)}.status-pill.done{background:var(--done)}.booth-meta{font-size:11px;color:var(--muted);text-align:right}.item-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:11px 13px;border-bottom:1px solid #f0f1f3}.item-row:last-child{border-bottom:0}.item-name{font-size:13px;font-weight:650;line-height:1.35}.item-detail{font-size:11px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.item-actions{display:flex;align-items:center;gap:6px}.price-mini{width:69px;height:34px;border:1px solid var(--line);border-radius:9px;padding:0 6px;text-align:right;font-size:12px}.status-mini{height:34px;border:0;border-radius:9px;padding:0 9px;font-size:11px;font-weight:700}.status-mini.pending{background:#e8f6ed;color:#237b40}.status-mini.purchased{background:#e7effd;color:#2d62ae}.status-mini.soldout{background:#eeeeef;color:#666}
+.section-title{font-size:13px;font-weight:800;margin:4px 2px 8px}.form-card{padding:14px;margin-bottom:11px}.field{margin-bottom:11px}.field:last-child{margin-bottom:0}.field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin:0 0 5px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:11px;background:#fff;padding:10px 11px;min-height:42px}.field textarea{min-height:70px;resize:vertical}.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.primary,.secondary,.danger{width:100%;min-height:44px;border-radius:11px;font-weight:800}.primary{border:0;background:#17191c;color:#fff}.secondary{border:1px solid var(--line);background:#fff;color:#222}.danger{border:1px solid #e4b6b6;background:#fff6f6;color:#ad3d3d}.filebox{border:1.5px dashed #bdc3cc;border-radius:13px;padding:14px;text-align:center}.filebox input{width:100%;margin-top:8px}.tip{font-size:11px;color:var(--muted);line-height:1.55;margin-top:8px}
+.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid #dfe2e6;padding:7px 10px var(--safe-bottom)}.nav-inner{max-width:820px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.nav-btn{height:51px;border:0;background:transparent;border-radius:12px;color:#747b84;font-weight:700;font-size:11px}.nav-btn .nav-icon{display:block;height:20px;line-height:20px;margin-bottom:3px}.nav-btn .lucide-icon{width:20px;height:20px}.nav-btn.active{background:#f0f1f3;color:#111}
+.sheet-backdrop{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.35);align-items:flex-end}.sheet-backdrop.open{display:flex}.sheet{width:100%;max-width:820px;margin:0 auto;background:#fff;border-radius:20px 20px 0 0;max-height:84vh;overflow:auto;padding:8px 14px calc(18px + var(--safe-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.16)}.grab{width:42px;height:4px;background:#d5d8dc;border-radius:4px;margin:2px auto 12px}.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}.sheet-head h3{margin:0;font-size:19px}.close{width:38px;height:38px;border:0;border-radius:50%;background:#f0f1f3;font-size:20px}.sheet-summary{font-size:12px;color:var(--muted);margin-top:3px}.sheet-item{padding:11px 0;border-top:1px solid #edf0f3}.sheet-name-row{display:flex;align-items:center;gap:5px;min-height:38px;margin-bottom:7px}.sheet-name-display{flex:1;min-width:0;font-weight:750;font-size:13px;overflow-wrap:anywhere}.sheet-name-edit{display:inline-flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:#68717c}.sheet-name-edit:hover,.sheet-name-edit:focus-visible{background:#f0f1f3;color:#222;outline:none}.sheet-name-edit .lucide-icon{width:14px;height:14px}.sheet-name-input{display:none;width:100%;min-height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 9px;font-size:13px;font-weight:750;color:var(--text)}.sheet-name-row.editing .sheet-name-display,.sheet-name-row.editing .sheet-name-edit{display:none}.sheet-name-row.editing .sheet-name-input{display:block}.sheet-name-input:focus{border-color:#7d93af;outline:2px solid rgba(63,121,214,.14);outline-offset:1px}.status-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.status-btn{min-height:38px;border:1px solid #dfe2e6;border-radius:10px;background:#fff;font-size:11px;font-weight:750}.status-btn.active.pending{background:#e6f5eb;border-color:#91c9a4;color:#22773e}.status-btn.active.purchased{background:#e6eefc;border-color:#9ab4e2;color:#2e60a8}.status-btn.active.soldout{background:#eceeef;border-color:#c5c8cc;color:#5f646a}.sheet-price{display:flex;gap:7px;margin-top:7px}.sheet-price input{flex:1;min-width:0;height:38px;border:1px solid var(--line);border-radius:10px;padding:0 9px}.sheet-price input.qty{max-width:72px}.sheet-footer{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.settings-backdrop{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.35);align-items:flex-end}.settings-backdrop.open{display:flex}.settings-panel{width:100%;max-width:820px;max-height:84vh;overflow:auto;margin:0 auto;background:#fff;border-radius:20px 20px 0 0;padding:10px 16px calc(18px + var(--safe-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.18)}.settings-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:2px 0 16px}.settings-head h3{margin:0;font-size:19px}.settings-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.settings-control{display:block;padding:13px;border:1px solid #e1e5ea;border-radius:13px;background:#fafbfc}.settings-control-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.settings-control-title b{font-size:13px}.settings-control-title output{font-size:14px;font-weight:850;color:#315f95}.settings-control input{display:block;width:100%;height:30px;accent-color:#4f76a8}.settings-control small{display:block;margin-top:7px;color:var(--muted);font-size:10px;line-height:1.45}.settings-trash{margin-top:12px;padding:13px;border:1px solid #e1e5ea;border-radius:13px;background:#fafbfc}.settings-trash-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.settings-trash-head b{display:block;font-size:13px}.settings-trash-head span{display:inline-block;margin-left:5px;color:#9b4b4b;font-size:11px}.settings-trash-head small{color:var(--muted);font-size:10px;text-align:right;line-height:1.35}.trash-empty{padding:14px 4px 2px;color:var(--muted);font-size:11px;text-align:center}.trash-list{display:grid;gap:8px;margin-top:11px}.trash-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px;border:1px solid #e4e6ea;border-radius:10px;background:#fff}.trash-copy{min-width:0}.trash-copy b,.trash-copy span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trash-copy b{font-size:12px}.trash-copy span{margin-top:3px;color:var(--muted);font-size:10px}.trash-actions{display:flex;gap:5px}.trash-actions button{min-height:32px;border-radius:8px;padding:0 8px;font-size:10px;font-weight:800}.trash-restore{border:1px solid #b8c9bd;background:#f2faf4;color:#277040}.trash-delete{border:1px solid #dfb4b4;background:#fff5f5;color:#a33b3b}.settings-done{margin-top:14px}
+.settings-settlement{margin-top:12px;padding:13px;border:1px solid #e1e5ea;border-radius:13px;background:#fafbfc}.settlement-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.settlement-head b{display:block;font-size:13px}.settlement-head small{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.4}.settlement-status{flex:none;border-radius:999px;background:#eceff3;color:#606975;padding:4px 8px;font-size:10px;font-weight:850;white-space:nowrap}.settlement-status.done{background:#e7effd;color:#2d62ae}.settlement-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.settlement-hint{display:block;margin-top:8px;color:var(--muted);font-size:10px;line-height:1.45}.settlement-result{margin-top:11px;padding:11px;border:1px solid #dce2ea;border-radius:11px;background:#fff}.settlement-result-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}.settlement-result-head b{font-size:12px}.settlement-result-head span{color:var(--muted);font-size:9px;text-align:right}.settlement-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settlement-metric{min-width:0;border-radius:9px;background:#f5f6f8;padding:8px}.settlement-metric b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.settlement-metric span{display:block;margin-top:2px;color:var(--muted);font-size:9px}.settlement-result-note{margin:8px 1px 0;color:var(--muted);font-size:9px;line-height:1.45}
+.swipe-item{position:relative;overflow:hidden;background:#b93f3f}.swipe-trash{position:absolute;z-index:0;top:0;right:0;bottom:0;width:112px;display:flex;align-items:center;justify-content:center;gap:5px;background:#b93f3f;color:#fff;font-size:11px;font-weight:850}.swipe-trash .lucide-icon{width:15px;height:15px}.swipe-item .item-row{position:relative;z-index:1;background:#fff;touch-action:pan-y;transition:transform .16s ease;will-change:transform}.swipe-item .item-row.swiping{transition:none}
+.settings-credits,.settings-author{margin-top:12px;padding:13px;border:1px solid #e1e5ea;border-radius:13px;background:#fafbfc}.settings-credits>b,.settings-author>b{display:block;margin-bottom:7px;font-size:13px}.settings-credits p,.settings-author p{margin:4px 0;color:var(--muted);font-size:11px;line-height:1.5}.settings-credits a,.settings-author a{color:#315f95;font-weight:750;text-decoration:none;border-bottom:1px solid rgba(49,95,149,.35)}.settings-credits a:hover,.settings-credits a:focus-visible,.settings-author a:hover,.settings-author a:focus-visible{color:#1f4f86;border-bottom-color:currentColor;outline:0}
+.license-details{margin-top:8px;border-top:1px solid #e1e5ea;padding-top:8px}.license-details summary{cursor:pointer;color:#315f95;font-size:11px;font-weight:750}.license-copy{margin-top:8px;padding:10px;border-radius:10px;background:#fff;color:#5c6570;font-size:9px;line-height:1.45}.license-copy b{display:block;margin:7px 0 3px;color:#3f4852;font-size:10px}.license-copy b:first-child{margin-top:0}.license-copy p{margin:0 0 6px;white-space:pre-wrap}
+.toast{position:fixed;z-index:120;left:50%;bottom:calc(86px + var(--safe-bottom));transform:translateX(-50%) translateY(20px);background:#1d1f22;color:#fff;border-radius:999px;padding:9px 13px;font-size:12px;opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* V2：更紧凑、更轻的地图信息层 */
+.map-note{line-height:1.5}
+.facility-locator{margin:0 10px 12px;padding:10px;border:1px solid #e1e5ea;border-radius:13px;background:#fafbfc}.facility-locator-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.facility-locator-head b{font-size:12px}.facility-locator-head span{font-size:9px;color:var(--muted)}.facility-map{position:relative;height:196px;border:2px solid #c7ced8;border-radius:18px;background:linear-gradient(rgba(148,163,184,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.055) 1px,transparent 1px),#fff;background-size:25% 25%;overflow:hidden}.facility-map::before{content:"";position:absolute;inset:25px 24px;border:1px dashed #d7dce3;border-radius:13px;background:rgba(248,250,252,.55)}.facility-direction{position:absolute;z-index:1;font-size:8px;font-weight:850;color:#9aa2ad;line-height:1}.facility-direction.north{top:6px;left:50%;transform:translateX(-50%)}.facility-direction.south{bottom:6px;left:50%;transform:translateX(-50%)}.facility-pin{position:absolute;z-index:3;display:inline-flex;align-items:center;gap:3px;transform:translate(-50%,-50%);border:1px solid #aeb9c8;border-radius:999px;background:rgba(255,255,255,.97);padding:5px 7px;color:#334155;font-size:9px;font-weight:850;line-height:1;white-space:nowrap;box-shadow:0 2px 7px rgba(15,23,42,.12)}.facility-pin.edge-left{transform:translate(0,-50%)}.facility-pin.edge-right{transform:translate(-100%,-50%)}.facility-pin.toilet{border-color:#9db7dc;background:#f1f6fd;color:#315e96}.facility-pin.consult{border-color:#e5b072;background:#fff8ed;color:#a45e17}.facility-pin.changing{border-color:#dfa2c5;background:#fff3fa;color:#9c3d74}.facility-pin.locker{border-color:#99b8de;background:#f2f7fd;color:#315f95}.facility-pin.escalator{border-color:#d9a1a1;background:#fff5f5;color:#a83e3e}.facility-locator-note{margin:7px 2px 0;font-size:9px;color:var(--muted);line-height:1.45}
+.facility-pin{pointer-events:none}.facility-zone{position:absolute;z-index:2;display:flex;align-items:center;justify-content:center;gap:4px;border:1.5px dashed #9caabd;border-radius:10px;background:rgba(230,236,243,.66);color:#46566c;padding:5px;text-align:center;font-size:9px;font-weight:850;line-height:1.25}.facility-zone small{font-size:8px;font-weight:700;opacity:.68}.facility-zone:hover,.facility-zone:focus-visible,.facility-zone:active{border-style:solid;border-color:#5e789b;background:rgba(217,228,241,.92);outline:0}.facility-zone.side{flex-direction:column}.facility-zone.side span{writing-mode:horizontal-tb}.facility-zone.side small{display:none}.facility-zone.creator{border-color:#d9a16e;background:rgba(255,239,225,.76);color:#9b571e}.facility-zone.enterprise{border-color:#8eaebe;background:rgba(230,241,246,.8);color:#3e687b}.map-target-section{scroll-margin-top:122px;border-radius:13px}.map-section-focus{animation:map-section-focus 1.25s ease}@keyframes map-section-focus{0%,100%{box-shadow:none}22%,62%{box-shadow:0 0 0 4px rgba(63,121,214,.22),0 7px 18px rgba(63,121,214,.12)}}
+.facility-neighbor{position:absolute;z-index:6;display:inline-flex;align-items:center;gap:3px;border:1px solid #8493a7;border-radius:999px;background:#46566c;color:#fff;padding:4px 8px;font-size:9px;font-weight:850;line-height:1;white-space:nowrap;box-shadow:0 2px 6px rgba(15,23,42,.16)}.facility-neighbor .route-arrow{display:inline-block;font-size:12px;line-height:1;writing-mode:horizontal-tb;text-orientation:mixed}.facility-neighbor:hover,.facility-neighbor:focus-visible,.facility-neighbor:active{background:#27364a;outline:2px solid rgba(70,86,108,.22);outline-offset:2px}.facility-neighbor.top{top:4px;transform:translateX(-50%)}.facility-neighbor.bottom{bottom:4px;transform:translateX(-50%)}.facility-neighbor.left{left:4px;transform:translateY(-50%)}.facility-neighbor.right{right:4px;transform:translateY(-50%)}
+.facility-neighbor.exit{border-color:#26834a;background:#2f9e5b;box-shadow:0 2px 6px rgba(31,122,68,.2)}
+.aisle-line{width:8px;background:#b8bec7;box-shadow:none}
+.map-marker{min-width:56px;max-width:88px;padding:4px 6px;border:1px solid rgba(255,255,255,.52);box-shadow:0 2px 7px rgba(15,23,42,.12);transition:opacity .15s,transform .15s,box-shadow .15s;opacity:var(--marker-opacity)}.map-marker.pending{background:rgba(44,156,81,.9)}.map-marker.done{background:rgba(63,121,214,.84)}.map-marker:hover,.map-marker:focus-visible,.map-marker:active{z-index:20;opacity:1;transform:translateY(-50%) scale(1.04);box-shadow:0 4px 12px rgba(15,23,42,.22)}.map-marker-title{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.map-marker small{white-space:nowrap;margin-top:3px}.marker-range{outline:2px solid rgba(255,255,255,.7)}.matrix-booth,.special-booth{opacity:var(--marker-opacity);transition:opacity .15s}.matrix-booth:hover,.matrix-booth:focus-visible,.matrix-booth:active,.special-booth:hover,.special-booth:focus-visible,.special-booth:active{opacity:1}
+.special-booth-title{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.special-booth small{display:block;margin-top:3px;font-size:9px;opacity:.9}
+.matrix-zone{padding:12px 10px}.matrix-scroll{overflow-x:auto;overscroll-behavior-x:contain;border:1px solid #e1e5ea;border-radius:12px;background:#fff}.matrix-map{display:grid;grid-template-columns:repeat(12,42px);grid-auto-rows:64px;gap:7px;width:max-content;min-width:100%;padding:12px}.matrix-slot{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;min-width:0;border:1px dashed #c9cfd7;border-radius:9px;background:#f5f6f8;color:#8b929b;text-align:center;padding:4px}.matrix-slot.has-wishlist{border-style:solid;border-color:#94c8a4;background:#eff8f2}.matrix-slot-label{font-size:9px;font-weight:750;line-height:1.25}.matrix-booth{width:100%;border:0;border-radius:7px;padding:5px 4px;color:#fff;font-size:10px;font-weight:850;line-height:1.1}.matrix-booth.pending{background:var(--pending)}.matrix-booth.done{background:var(--done)}.matrix-booth small{display:block;margin-top:2px;font-size:8px;font-weight:650;opacity:.9}.creator-matrix{background:#fffaf6}.enterprise-matrix{background:#f7fafc}.matrix-unmapped{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:9px;font-size:10px;color:var(--muted)}.matrix-unmapped .matrix-booth{width:auto;min-width:66px}.matrix-caption{margin:8px 2px 0;color:var(--muted);font-size:10px;line-height:1.45}
+.matrix-slot.matrix-zone-title{align-items:flex-start;border:0;background:transparent;color:#cf6d25;padding-left:2px}.matrix-zone-title .matrix-slot-label{font-size:15px;font-weight:900;text-align:left}
+.overview-wrap{padding:0 12px 14px}.venue-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto auto auto;gap:8px;padding:10px;border:1px solid #e3e7ec;border-radius:15px;background:linear-gradient(145deg,#f9fbfc,#f3f6f8)}.venue-hall{border:1.5px dashed #d7dde5;border-radius:13px;background:#fff;padding:11px 7px;text-align:left;min-height:74px;box-shadow:0 1px 2px rgba(15,23,42,.04)}.venue-hall strong{display:block;font-size:15px}.venue-hall span{display:block;margin-top:5px;font-size:10px;color:var(--muted);line-height:1.35}.venue-hall.has-pending{border-color:#9dcfac;background:#f1faf4}.venue-hall.h4{grid-column:3;grid-row:2}.venue-hall.h5{grid-column:3;grid-row:3}.venue-lobby{grid-column:1/3;grid-row:2/4;border:1px dashed #bfc8d3;border-radius:13px;padding:13px;background:rgba(255,255,255,.72)}.venue-lobby strong{display:block;font-size:13px}.venue-lobby span{display:block;margin-top:5px;font-size:11px;line-height:1.5;color:var(--muted)}.overview-caption{font-size:11px;color:var(--muted);margin:8px 2px 12px;line-height:1.5}.facility-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.facility-card{border:1px solid #e1e5ea;border-radius:12px;padding:10px;background:#fff}.facility-card b{display:block;font-size:12px}.facility-card span{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.45}
+.booth-id{min-width:0}.booth-title{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.booth-circle{font-weight:650;color:#505862;margin-left:5px}.booth-meta{white-space:nowrap}
+
+.facility-pin .lucide-icon{width:12px;height:12px;flex:none}.facility-card b{display:flex;align-items:center;gap:6px}.facility-card .lucide-icon{width:14px;height:14px;flex:none}
+@media (max-width:430px){.row2.mobile-stack{grid-template-columns:1fr}.booth-card-head{align-items:flex-start}.booth-meta{padding-top:2px}.map-marker{max-width:72px}.facility-card{padding:9px}.facility-pin{font-size:8px;padding:5px 5px}.facility-map{height:190px}}
+@media (min-width:700px){.content{padding:16px}.aisle{width:76px;flex-basis:76px}.map-marker.side-left{right:41px}.map-marker.side-right{left:41px}.special-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.overview-wrap{padding:0 14px 16px}.venue-grid{padding:14px;gap:11px}.facility-summary{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.freebie-stamp{display:inline-flex;align-items:center;justify-content:center;border:1.5px solid #b74435;color:#b74435;border-radius:4px;padding:2px 4px;font-size:10px;font-weight:850;line-height:1.2;transform:rotate(-7deg);vertical-align:middle;white-space:nowrap;flex:none}.freebie-stamp.claimed{background:#b74435;color:#fff}.freebie-stamp.unavailable{color:#79706b;border-color:#aaa09b;border-style:dashed}.freebie-stamp.mini{position:absolute;right:-5px;top:-8px;font-size:8px;background:#fff8f1;padding:2px;z-index:2;pointer-events:none}.freebie-stamp.mini.claimed{background:#b74435;color:#fff}.matrix-booth{position:relative}.freebie-editor{margin:12px 0 16px;padding:14px;border:1px solid #e5c8be;border-radius:14px;background:#fffaf5}.freebie-heading{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:14px}.freebie-options{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.freebie-options button{min-height:42px;padding:6px 2px;border:1px solid #dbcfc8;border-radius:9px;background:white;color:#655650;font-size:12px}.freebie-options button[aria-pressed=true]{background:#b74435;color:white;border-color:#b74435}.freebie-condition-label{display:block;margin-top:12px;font-size:12px;color:#7b5b50}.freebie-editor textarea,.field textarea{box-sizing:border-box;display:block;width:100%;min-height:70px;resize:vertical;border:1px solid #d9cdc6;border-radius:9px;padding:10px;margin-top:6px;background:#fff;font-size:14px;color:#302c29}.freebie-editor small{display:block;margin-top:8px;font-size:11px;line-height:1.5;color:#8b7469}.freebie-list-note{padding:0 12px 10px;color:#a04738;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.stamp-pop{animation:stamp-pop .28s ease-out}@keyframes stamp-pop{from{transform:rotate(-12deg) scale(1.5);opacity:.25}to{transform:rotate(-7deg) scale(1);opacity:1}}
+.battle-dialog{color:var(--text);background:var(--card);border:0;border-radius:20px 20px 0 0;padding:10px 16px calc(18px + var(--safe-bottom));width:100%;max-width:620px;max-height:90dvh;margin:auto auto 0;overflow:auto;box-shadow:0 -10px 40px rgba(0,0,0,.18);overscroll-behavior:contain}
+.battle-dialog::backdrop{background:rgba(0,0,0,.35)}
+.battle-dialog #fireworksCanvas{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:1}
+.battle-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted)}
+.battle-toolbar>div{display:flex;align-items:center;gap:8px}
+.battle-toolbar #skipFireworks{border:1px solid var(--line);background:#fff;color:#343a42;border-radius:999px;font-size:11px;min-height:34px;padding:5px 10px}
+.battle-toolbar #skipFireworks[hidden]{display:none}
+.battle-toolbar .close{display:grid;place-items:center;flex:none}
+.battle-toolbar .close svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;pointer-events:none}
+.battle-hero{text-align:center;padding:20px 0 24px}
+.battle-eyebrow{font-size:11px;color:#8166a1;margin:0 0 8px}
+.battle-hero h2{display:flex;justify-content:center;gap:5px;font-size:30px;line-height:1.6;margin:10px 0 12px;font-weight:850}
+.battle-hero h2 span{display:inline-block;transform-origin:center;white-space:pre}
+.battle-hero time{font-size:11px;color:var(--muted)}
+.battle-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:4px 0 8px}
+.battle-metrics>div{color:var(--text);padding:12px 0;background:transparent;border:0;text-align:center;min-width:0}
+.battle-metrics strong{display:flex;align-items:center;justify-content:center;min-height:36px;font-size:var(--metric-size,26px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere;line-height:1.2}
+.battle-metrics span{display:block;margin-top:5px;color:var(--muted);font-size:10px}
+.battle-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin:22px 0}
+.battle-tag{display:inline-block;padding:3px 0;border:0;background:transparent;font-size:16px;line-height:1.5;font-weight:800}
+.battle-tag.tone-wish{color:#d92765}
+.battle-tag.tone-gift{color:#2563df}
+.battle-tag.tone-ledger{color:#7938d2}
+.battle-actions{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.battle-actions #downloadBattle{background:#2563df;border-color:#2563df;color:#fff}
+.battle-actions #downloadBattle:hover{background:#1d51bc;border-color:#1d51bc}
+.battle-actions button{width:100%;min-height:44px;border-radius:11px;font-size:12px;font-weight:750}
+.battle-footnote{text-align:center;color:var(--muted);font-size:10px;line-height:1.5;margin:12px 0 0}
+.battle-dialog button:focus-visible{outline:2px solid #7d93af;outline-offset:3px}
+.battle-dialog button:disabled,.settings-settlement button:disabled{opacity:.45;cursor:default}
+@media(max-width:360px){.battle-dialog{padding-left:14px;padding-right:14px}.battle-hero h2{font-size:28px}.battle-tags{gap:8px 12px}.battle-tag{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.stamp-pop{animation:none}}
+
+
+
+/* Embedded Fusion Pixel 2026.10.25, 177-character subset; OFL notices in Settings. */
+@font-face{font-family:'CP Fusion Pixel';src:url(data:font/woff2;base64,d09GMk9UVE8AABdgAA0AAAAASSAAABcQAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADe0xG4QQHGwGYACFOAE2AiQDhUwEBgWOHQcgFyQYgmgbOUgV7NhLgPMI0fE3LibjmIPHkTqBhSjKB6kK/P8hgRsyxD60l0WJZQKrDBqTlJQoBiBuRGfMpoLAgtvEwovuq9U4Ck98h077a99z7jl/ezWiXhdFOISl/69bf4TGPskd4m/+3avJTWYDUBMdJvAT6OfPRu+4N7qLRn8mIYRRIWWSBXoT/3bhvL9/k+MCnUEFzrtWkwIWsPEqFpsshXRhZi/H+uKFB4A6VLu2aifVpc8rp9PWWEIwpzBkDYe2Ce203IhdQlKxEbf1VaLYWEhz8h/p5LHPUnR8AaeHmaDlykkMQGonungRFi/hx4uw+BF+vFiw4xu+AGWBZ4L5X0uV6rneye2fkI36d0MeA6QxNSDmJuS8q/b3tK6lpXTCOiGlARyUCQxEYTQAsPjfL+2Ndks/ySERZGrADOMmhJZK99x3T6nD14769cgpBN331FvTMxskx4i8aMsAbgLQgPKFDTjKedxpUFiUFtVVxyrtYJIoHu49m1LL96UPMFC2q0lS9c7GWP/9Pa/qpaLAMGD7QugCMBBuj047lqi/d0+4pibxhxhpbn//3w+/XCoBCKiaVWuOXYAqpAfz0RlA1Biw4sRHmARZStTpMGTGmj0XnvwEw4uWIFWWfCUq1WnWgazPsAmzlqzbceiU86646Z7HXnjrk5d/AJyQHrJADF5CxMlQpEabAVNWsJx58BUEJ0q8FJnyFKtQq0k7kl5Dxs1YtGbbgZPOueyGux5570sAmQg9woJg4k0o8WRSTC3tDDLNKmzOeeRbULiiii+lzPIqrqLammqPVG9DzbfSZnsdd6ab3etxL3rbp743gaJFMaHYuQVEpeRVNPWMLWwd3bwDQiNik9JzKuuaO8hj05tiWQCCFUSYUMaFdJSrTTsGiDChjAvpKFebdgIQYUIZF9JRrjbtFCDChDIupKNcbdoZQIQJZVxIR7natHOACBPKuJCOcrU0xj36sfL3/+fr8/3798ysNh5F09zDupcfIylEdCCkDRzicRJvZDMPA1DGrdWPzJq30qEuUXR2tohOeqzqzJLAhK2x5BThUjeuU2YuA/USjYtsaNKQlxFCQDhHJ/gQ6mITOZ6ywX1A3MyXCmqSrg3bikWSDNPBNZx6ybA6FSFVa+cASxwqnV4iSxIwshDyUcoqqnRqIm9qazc/QYWkdylMqQoiTYZ2OZ1lb2vc6wMtQCYTsODptLPSGdE9sQtI2wKvjP7WjL73zzz7/9FLBmAqvmChAESFFh8VkebDK0OJcRejQcRSzzjbkpvsoD9H5+BOwzk8z1Zq/Td+K3Zlz+yvK3OL7v59Z2OUQReMwSLcwZv4npjoREFEotPMyipczmuClkE0JU3OqoYm6ZCu6UP9ZkeTNT0LsxKbtUtGcRG38Riv9El/6J/jEMYRHuUxFDuJ5JbWmZbrSSmtCqzKaq2det6JsqqyGrGOsv7utdgK2YbZnrPzsmPZU9nL2TvZn3PYcqxgpDHBmENOUU4nzibOPS5ZrkKuW9xq3Ld5gnlqeK7wYnkP+Uz59vj1+W8JxAs8F+wR4hZqEuYSxgtfEOEXSRO5J6oouipmLjYkzi9eIv5jS5V4KmklOSclIVUrzS99IGMhsyKLlZ2W/dUy5X7s+QoMCleFD4oFShilRKVt5UjlSuWrys8F0LO5d+/+Wfpm6yyLR7AS+uCEmXKR8jP5veRym7ksCLtiU9bLJaQC25bYQcCnfn9u+XtbMPkPtroHxECue2OUrS21r4AVnsy7RhqCYnoV9SqhWeTPJZZXHW9OSYy3oPq4pEKm5X14WQCMPSrPf14mXtRH6q74zYrpb5BW8UJRn7UYEPVyFDwKATUcfFHingmGE2Q/kYCltQlqsgxL8tny4bIL1BpGXdvKa+aAEXmOdVYOLXqPynA/RFvNe6zHYVKBJYJRK5M8x3kztuATGFsLrODpeoMwWrCn3Edg0Dgq5oZz+oVykYSaaab+DKho4d+J15p4LsUavxG4pxfPhM10Aniasoj4uynbcH+8rZ4POO0phcL8essS7XGBJ4aJ4la9DCzqmK/rKfeFdnVxxu2cxihrQOluQtBkbyuCimVhyqDHJDfmtF/xuT6u7klhY7bdRqIYh+ezIh5/Kr0PT17u8MgByOnzk33ldcWk//Cr6ea/uLs8weprumkn8czI2tG+ie2SSKwlvAT6rKu56CXP3YWgfU5hI5NDiLBb9PYWKU5ZjPaMuvx04AMMKTJSCaPANC3lH5+NY1Exoi9aAanozVLkrJZ+4hEuhNvD3mWmR1SUb/bYGiv5+D2W7mCJ/pOl5XMvZzuMvrej0l5EotDcOJah2ivNRm1mNrmuJB9sNr3fo3PNIC0sWev4DHOW/VuArdNTXDliw7PrpH1rZAcAKXetjbjRLAA5LEqB4JITJ7m5tvYRxYZiNP1ZNW3iW1YjM5OafwGgWPsDxDavOEAyAjHpGGVciDspJMclhmrvhlDUute+Hzv6lgKqVCnMaHwj54voOQehOe2Wnn3PtfBnXzj7Mq/8u9yYJlrFxy2taHh1oJLmO2Ou74WGnJ7refBY+fnvjTDi4RjhFLTlYddH6yLnOn3P+0458PXvMQoeTnAvsPnT9weZ7yYmE/n5p6jRdoRR6uk4We86w7ow/wBRFhJHUAAL58ejP3CUU9SZrZRAmgp16MdriGLdnRGvtbI9WgSpjDVZl/9Qh+nKKeLY40Hq8l3WWRRGpaifU8zPPHyCUW454N6E99b4M4JloHKK2VRLF3ctbPCVjdf06YzjlFHrVz5BxpZGZsaC2rTxHvdZ8D3uY08aXyhsw8eu0M40i/KPJea1q/5w5jXXNILGEas7Z9y8vdI/epQ/iaZ2kSWtca9nyrsrDtO4Y9B+oYnu12QgzEDmbJZ7d9FtfxgYiAMMV9IC80EoY36F6wzObJ0DJhuW08ri2yeInZyyD8du2prptEmwWlL90ew0o+tN77ZsbCVeG7yIvdbK8OL94Y0NY/nTVBMoDG0gDWY8HsFMsipqlckv4LM/vCQg8LJ/z3/H9iA3hGuveL7P/e8wSed6WTY7NLJ0Zy9d1XflnSu/h9Fu17o3qHTxaOwoUWi13SzX2tsR+n91mMjqtSziuki0MmudeBFB2ABYHTlmoYnQfqmx+Ybj3q2JFWOI6C6pNLo+xcJf1ZxGfGRvT99/Z53+r1Gv9Ts7+YS1Lt33xbJfWUxhqXfHbvk3De9/cG40JPuoNMtYBKR5pTRByvJhE6fJCncpnpVlsCV+ST96LQj6CYqyyUG8+kgpdMBQAqgvtDmpaUqsO80KxlSZArSzCMMiQLFRHjBPYI/8TVvCWohNfH76Nh7BKpmtH4RJjegiJ/TaNSf9eWSWtLhb4V3pTqW0qU4iukwqUbJpu3wf2vveM7EQ8j9H2TbfCAJkj4UO14Bn2hvbG/HSN9tqazJD5yYS0W5caHQHlnVgeQxNac/SIJh2u0RDDgVeKl4FzGACr5aW+nbD4ncczqMG8/pCwIELIrLWyKyuWeZujSR9eMG+9e6f3kMx8LEvygBzFcybz/bRyLvvLHEf2s6cN1mydqgzf8CCFXvmG+4wjKU7XtM7Odt45vR3Cigcc3lPuN5ddz7Iu/yo6Tb9yDkq63sFT4Snd8VyNyzsyoHGykCr56KeXBUcCEsa39asWuVmdC1WreRXtZz4PHVqIokKX6rr2dlZCCW0/hwXheelgi7BQIKVUe+Tx0uudEJ17J47WZF1VqtX7V7ODhW/L3VjtixrFqp6qmuH2sM7vyeQ9tuawttYlmXkFXc8LmKeuflp5/eb+NUcIuAMPXCwVHRp34xajmqW8ZEg/FlwTUjgK+nT75wLXPSHTS92AT6uLXPwfOxmKFlP8f1hevVD6O7T65uzVvOzO+pz5XkEjhPYcqgkXUeB8BcisU9g1wASJdvDdpLfL0QNRTccqiG9Ukg+6rN+sCYP+dicBUQOwakOwElb9BVxtWKhMTrOr3PqKNyviBGr7rnIrPUTFWeI5Tk0K31JsOpAasOYKq/Yva1iY8WU4SM1oPv6PmeVg+DHCrskumgsUm/Kc7fokQJgbh/UgG4dhJXkZRsXjF4CCbfpXDCs++8AbT9wtMWa2lKPLeV7Ge4RHPQTnhTjX8HbQlw2ZlcpDCgkRvAJE25AlWSl0U/Xx7G3tDBu7C14oJdMRpKPxbwDq3eS/ZxGWIewuFsHaQlbDg7CLzMoZgINo4UDYaAytgTwWkspk3gVaE11giHlfkB8oE3Ne/GMZnLMGUKx4Lgs1XwpvQhUqQ99oIJrtsTUid3uVsXyhmqBFfdNkL/hho8ChcpACO2c/QGGWrgKBvJrDXGkJK7KGEd1MoShrpn+V7jka9sAfj7sj4tmfKbFGHgkPVbIz38VgRpoz/33i3rVRj+9tUNTryrqRyDLOP4w4JjeKFRBACRMCi4pCYDuhcm45nHfv+NCGb1931zppxGWs/ezvmwHrSQuenNhsUVFResWR2YTWwlbpDjyy1mo5f+XFjv5D211882v7lzT2Mt6XnZH2yrCKU8tKTkenW+DxX7M6yw49COOsYaa3j2akI0sG/UXR1S2t0vpRUDMBlGqu+ntSbQnyx/41cv14uqHwOolem0H3m+EQquEYSrbpL8PHH14RmHdFpQkqhDyOj5jEOm9kCu8Dy0c+PgwATWuqn67z3fpPgU3mvdIpVkMw5z7SxV7ZHRwPZXTA2KypTZuIIC46VkfF4ta0Vgu428YE9Uao69J5UpoFiz5ntsI2nVkvzs1cI1xmQUPyEdNHFqK3CIe658pCOU+XFHf3+5J/EfzBFD7VLrGeMZ18SAYYFoAGUb9gCV/R78Z8MHWw6NYSr6tPI6rV93xZF+FilayCz2tqIkc3tAGswNH73Xc/C2+QFMpGj5y/9lwjzUNTHE/YPkDv/vU17wP00Tnk0SFH9cPdDrZAcwpBHsgq8BOC4mBWpC4BxeCZ1p/G8WAGr2/nFmOzdI9BJRSRFKaw2oKFfjEkpv4t+/J+j6fWkyTfATrqpYjpNtxwtSEqBNzQp4us5T32Gxdjj6mxcNFZVGD6ZOfhm6wQZOg/3DpS3EIzzofEVqBy4UO0XPs1SbWaz/ozW1ZTkTtOcu0hC5A/Spbyr1EGhTYwAdCMGwtnKLu9ZIeAassok8v2Qbth0zopDSbQYs1hjlH5LINMs1GYI0wHtxP2vMcm94Ih7PZBH+STheA1mTWs3VZ2CYT/uJop76kB/tWcWA2cVzE8G8QzPrC4SSYOFbNMlRL6S2kOISl6qzIxQfOLCZbvav5YMI9WbYNtuV18QviA5w1pMjLSgkRrfEjIOK0wwW723otp59UK68oik3UJrJElbZpGcsJCLj6LwO9xixWhxjPOUR/LrCvCBaDhwUcRGHk8iUCdwFbYvwIZUlVZOfGCseKy6AGAvnVJ8NdLAaXOp1IxTwnrjFsuT+Q0HUcM42SuHL1gWOqB/eFDx/5Cz3iTuubCv9rx22ZInOftYJpyiICZaSQcux01zn+pIoJCNbaCha+0rzYW6r/3jd9EUWuPur2itxPXoUKs/mY9zmKYOHHxrnCrQBLTG3t4nSrIUHy+VyhprQ+0P3lCHC2Mo0oZS5tYpEFpk1BJPZEIewUl8p8xawNkHtSSOKjdBBWjjOuxFRMtrD69zf2vdJtbW7Myjjg8yBbCVpA9NXaTq+v3lWfYXPaV5cIU97AQMyscsNiL5JyZ113Y/WXf24tn1+ZVaci3c/7OCdCefY0Ql2vCbbKEm9CjrFSLkSVgQNRE5uzJAWxQxWgsUyd/sCatKVKKazajDJ7wjRLtIMmzj79Lu6+Vb45HNW1YFRsnCgsWHFFFGDCW0ZA4vIpBMG47yglW01cwD2pJS18laa11Crf0+q4UPn+v2DpY4QOXl70bYeWGR0skdhu57m9PUtMr5uyCcQ2lLlo9ymY2C9XduqUEyZSWwhFt+yz4oeO6pxikugdPNOwRr79A62zzz0DH+FSEqb9WE5uxNme2j7sffb2V+c0gACgJ0QBvD/27oAWGgDgP7I+9HyT47XEG5AT8ww0ZAfaQKH2j9m48o7j5Ju0HUci36VFu9Y1suv8Lx+IDSsx0hSp0qRNhx5D1uw4cOPFmy+IdZPR0dyiTehAD9bAwgEe8Hp2hpriDfgOoTEBLBCD2eN5csWCsLRW8qydTDjCCc5wgau40brrethTn/XRafxQ3l4LbKyzRLg/Gy+mF22DawQypIDtQGmFWQeSc5eYKH18YlOHENS1lvq6ggJhYiNGAwApY8MHJGPH70HH5yB+qCZrHCotVx9a4vJ16hcCqAMClxWMQ+CwyH52Mf+rgNVHQc8yQK5TWq6jVT0DZTAINe2ha9Dn0dZC1CTkG7JyYlQQUVTC8eXk4HRvh3dJcfnjOubm4fbhyOz5OP/3kvHz9qv1W/b3CPgcmBrkEXTgGoeyhvKEYkOHwvpxdngtfCI+FU/Az+Ifhs/C7+FfI+giWoRChF5ESIxozLWKKvGe+EBZJ0elUqdf0t/fnj02cjryxPJ38q/8z5VdqMTXzNZJ1SnW6dZ9adhuONFwtZG/7V3b185yCqQ8NwUAIkjljp6WivJob1DGHzpeTC86c5lzYrMt0//PMzBj6vSU8GT5ZOQYYSx7zGVIbPDD4PGgTH9tP0Pf3tvXY9ad3B3Tzdf1gPyEbEByIfGQOImfiHeI5cRiYjuBABBeAo7gRVBtS27daW5suNewWi9Wr1zbUs1VlVu5XP6ojLrkXPSw6Fzex+wrd6PUrykFKVkp8clLiW/EE3FDNEXvZuuRsiw3M2dBG78jEql+epn8r8HDd09SEIvBjxaFnl0/8qJ+DH3dLYZeQYm1Py9jvEZWBdQpAhxfjmt7q6uF0rcg1wD4Gpx9L6428x5EnQN8K7Nnq0+a+a5ObkUe4Y/wtwYNfdS50zP1JjCm6XS++MTpIFbQxJLDb2sune2QmefxvLm61dcP8DX1dmIS/fH129yAR3FpvfS7kmUPaJWU/69fAmdO+rUW4AwsLACBeEY7VGNphoSoMoKGk6AyCR5Gk1LBVOhNCfXOXmFaNO49TLdmemaeMgPJSDEjjmCZCTaBy8wsMjYnOtN0AIDQvFsyZFBOjGCuGkYJLQKj2dcfpoIZ1kzNfvgxLeYxEk3H9ErHEjOwa11mJNUlzKS9x15jVjmN/5xJ3ef12z/9Y/jo5mNvPtL6makpE8RNDdmwsz22Oq2rj8JXo9SowTL3PhOcupX+BiexipmYgRmYjRa35u/rRn0A6xP+IdnC9grPnZXEjVEf3ZLGwZw6t66rR8z0NQhyRgbzxcBe6hsvPOSO9qUHgkg4Ix2pzhSK5WHinps8pofeMGPRiZ+0nxg86NKwGtOH2RKgxhjSy0rxr7w6zgjTsC1OTWK9jaUm3oBsF/WK2qNjVVj6Hzb6g7gZLxsDNeFBScUSBmjxtQGuj+N6wJErd1ErRPVU/U8bgvaLoswl+zZE+Pg9pbYxS0vVKmArdRcqAIYT7iWitgjvbz4l0JSrou2FYlbBpaRFYy7mYlP4ONzbPwuXPhFMhFwv7gPvY2B/Bx0P2IrrWkU2XUEoWXRUbM2IL0QcuCWytIeN1Dad+3BQvjQwt4g9LGw2EU4dEQm+CaDRQKuoCaKSIeMhjw+j4tHI4iiR1PAUJHLuI75WjhKp9zvGiOXgITI3P2kvxGr5HE75O4Vfe8BYT2hbhoCRIJSwMbMEHr0i/dGlFPTMeX05Zgxr7+vxj8RSHROWd3kMbcG7+2uJ8hS+eDpccn2vMfwEtTQzMLJ2MII2xpZewUOrm2wxedmCif8/gzUqUSvk1+uRtLw0mrMfpW+4zljLWRr/OBTyVU9QNvBiViS655QmLhN5EazyhjKx73mp+f+u4AG2VAo=) format('woff2');font-weight:400;font-style:normal;font-display:swap}
+#battleDialog,#battleDialog button{font-family:'CP Fusion Pixel',sans-serif;font-synthesis:none}
+#battleDialog h2,#battleDialog strong,#battleDialog button,#battleDialog .battle-tag{font-weight:400}
+#battleDialog .battle-hero h2{font-size:36px}
+#battleDialog .battle-toolbar,#battleDialog .battle-toolbar #skipFireworks,#battleDialog .battle-eyebrow,#battleDialog .battle-hero time,#battleDialog .battle-footnote{font-size:12px}
+#battleDialog .battle-metrics span{font-size:12px}
+#battleDialog .battle-tag{font-size:18px}
+#battleDialog .battle-actions button{font-size:14px}
+@media(max-width:360px){#battleDialog .battle-metrics span{font-size:10px}#battleDialog .battle-toolbar{font-size:10px}#battleDialog .battle-toolbar #skipFireworks{font-size:10px}}
+
+
+/* CPT-F map and compact freebie seals. */
+.freebie-stamp{width:22px;height:22px;padding:0;border-radius:50%;background:#fff8f1;opacity:var(--freebie-opacity,.7)}
+.freebie-stamp svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.freebie-stamp.mini{position:static;width:16px;height:16px;min-width:16px;padding:0;vertical-align:middle;pointer-events:none}
+.freebie-stamp.mini svg{width:10px;height:10px}.map-marker-meta{display:flex;align-items:center;justify-content:center;gap:3px;margin-top:3px}.map-marker-meta small{margin:0}.map-marker-meta{white-space:nowrap}.map-scroll-hint{font-weight:400;font-size:10px}
+.map-marker,.matrix-booth,.special-booth{opacity:1;--marker-alpha:var(--marker-opacity)}
+.map-marker.pending,.matrix-booth.pending{background:rgba(44,156,81,var(--marker-alpha))}.map-marker.done,.matrix-booth.done{background:rgba(63,121,214,var(--marker-alpha))}
+.map-marker:hover,.map-marker:focus-visible,.matrix-booth:hover,.matrix-booth:focus-visible{--marker-alpha:1}
+.settings-control+.settings-control{margin-top:12px}
+.venue-grid{grid-template-columns:1fr 1.3fr;grid-template-rows:repeat(4,80px)}
+.venue-hall.h9{grid-column:1;grid-row:1/5}.venue-hall.h4{grid-column:2;grid-row:1}.venue-hall.h3{grid-column:2;grid-row:2}.venue-hall.h2{grid-column:2;grid-row:3}.venue-hall.h1{grid-column:2;grid-row:4}
+.horizontal-aisles{display:grid;grid-template-columns:repeat(2,360px);gap:24px 28px;width:max-content;padding:12px}
+.horizontal-row{position:relative;height:160px;border:1px solid #e3e7ec;border-radius:12px;background:#fcfcfd}
+.horizontal-row .aisle-letter{position:absolute;left:0;right:0;top:64px;text-align:center}
+.horizontal-track{position:absolute;left:24px;right:24px;border-top:5px dashed #c9cfd6}.horizontal-track.upper{top:45px}.horizontal-track.lower{top:115px}
+.horizontal-end{position:absolute;font-size:10px;color:#858d98}.horizontal-end.start{left:20px}.horizontal-end.end{right:20px}.horizontal-end.upper{top:23px}.horizontal-end.lower{top:127px}
+.horizontal-row .map-marker{position:absolute;transform:translate(-50%,-50%)}
+#battleReport{position:relative;isolation:isolate;padding-top:20px;padding-bottom:26px}
+.battle-decoration{position:absolute;pointer-events:none;width:38px;height:38px;transform:translate(-50%,-50%);z-index:-1;opacity:.55}
+.map-unmatched{margin:12px;padding:10px;border:1px dashed #c9cfd7;border-radius:10px;font-size:12px;color:#69707a}.map-unmatched button{margin:4px;padding:7px;border:1px solid #ddd;border-radius:7px;background:white}
+
+
+/* Refinements: one event header, centered booth IDs, horizontal navigation. */
+.topline{gap:10px}.topline .title{flex:none;font-size:17px}.event-summary{flex:1;min-width:0;font-size:10px;line-height:1.5;color:var(--muted);text-align:right}.topline .badge{flex:none}
+.facility-zone.side span{writing-mode:horizontal-tb;overflow-wrap:anywhere}.facility-zone.side{flex-direction:row}
+.freebie-stamp,.freebie-stamp.mini{border-color:#237b40;background:#e8f6ed;color:#237b40}
+.freebie-stamp.claimed,.freebie-stamp.mini.claimed{border-color:#2d62ae;background:#e7effd;color:#2d62ae}
+.freebie-stamp.unavailable,.freebie-stamp.mini.unavailable{border-color:#999;background:#eeeeef;color:#666}
+.freebie-options button[data-freebie-status=pending][aria-pressed=true]{background:#e6f5eb;border-color:#91c9a4;color:#22773e}
+.freebie-options button[data-freebie-status=claimed][aria-pressed=true]{background:#e6eefc;border-color:#9ab4e2;color:#2e60a8}
+.freebie-options button[data-freebie-status=unavailable][aria-pressed=true]{background:#eceeef;border-color:#c5c8cc;color:#5f646a}
+.map-marker{min-width:90px;max-width:124px}.map-marker-heading{display:grid;grid-template-columns:16px minmax(0,1fr) 16px;gap:3px;align-items:center;width:100%}.map-marker-heading::before{content:""}.map-marker-heading .map-marker-title{text-align:center}.map-marker-heading .freebie-stamp{margin:0}
+.matrix-booth{min-width:90px}.map-marker-meta{margin-top:4px}
+#battleReport{padding-top:48px;padding-bottom:48px}
+@media(max-width:360px){.topline{gap:6px}.topline .title{font-size:15px}.event-summary{font-size:9px}.title-star{width:15px;height:15px}}
+
+
+/* Compact header and corner seals. */
+.title-wave{width:20px;height:20px;fill:none;stroke:#257dab;stroke-width:2.8;stroke-linecap:round}
+.event-summary{flex:none;margin:4px 0 0 27px;text-align:left;font-size:11px;line-height:1.5;white-space:nowrap}
+.map-marker{min-width:56px;max-width:88px}.matrix-booth{min-width:56px}
+.map-marker-heading{display:block}.map-marker-heading::before{content:none}
+.map-marker-heading .freebie-stamp.mini{position:absolute;right:-5px;top:-8px;margin:0}
+@media(max-width:360px){.event-summary{font-size:10px}.topline .title{font-size:17px}}
+
+
+/* Shared shopping states in overview and navigation. */
+.hall-head .event-summary{margin:5px 0 0;font-size:11px;color:var(--muted);white-space:normal}
+.facility-zone,.facility-zone.side{flex-direction:column;gap:5px}
+.facility-zone .navigation-status,.facility-zone.side .navigation-status{display:block;font-weight:600;opacity:1;font-size:9px}
+.navigation-status .dot{width:6px;height:6px;margin-right:3px}
+.venue-hall.shopping-gray,.facility-zone.shopping-gray,.facility-extra-zone.shopping-gray{border-color:#ccd1d8;background:#f3f4f6;color:#667080}
+.venue-hall.shopping-pending,.facility-zone.shopping-pending,.facility-extra-zone.shopping-pending{border-color:#8ecba1;background:#eaf7ef;color:#237b40}
+.venue-hall.shopping-done,.facility-zone.shopping-done,.facility-extra-zone.shopping-done{border-color:#91b3e5;background:#e9f1ff;color:#2d62ae}
+.venue-hall .venue-status{color:inherit}.venue-hall .venue-status .dot{width:7px;height:7px}
+.venue-grid{grid-template-rows:repeat(4,minmax(90px,auto))}
+.facility-extra-zone{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;margin-top:8px;padding:10px;border:1px solid;border-radius:10px;font-size:11px;font-weight:700}.facility-extra-zone small{font-size:10px}
+.horizontal-row{border:0;border-radius:0;background:transparent}
+.horizontal-track{border-top:6px solid #b8bec7;border-radius:4px}
+
+
+.import-warning-dialog{width:calc(100% - 32px);max-width:440px;max-height:80dvh;overflow:auto;padding:22px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--text);box-shadow:0 12px 44px rgba(0,0,0,.18)}
+.import-warning-dialog::backdrop{background:rgba(0,0,0,.35)}
+.import-warning-dialog h2{font-size:18px;margin:0 0 10px}.import-warning-dialog p{font-size:13px;line-height:1.6;color:var(--muted);margin:0}
+.import-warning-dialog ul{margin:16px 0;padding-left:24px;font-size:14px;line-height:1.9;overflow-wrap:anywhere}
+.facility-zone.exhibition span{white-space:nowrap}.facility-zone.exhibition .navigation-status{font-size:8px;white-space:nowrap}
+
+</style>
+</head>
+<body>
+<!-- Lucide Icons, ISC License: https://lucide.dev -->
+<svg class="lucide-sprite" aria-hidden="true">
+  <symbol id="lucide-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="lucide-map-pinned" viewBox="0 0 24 24"><path d="M18 8c0 3.613-3.869 7.429-5.393 8.795a1 1 0 0 1-1.214 0C9.87 15.429 6 11.613 6 8a6 6 0 0 1 12 0"/><circle cx="12" cy="8" r="2"/><path d="M8.714 14h-3.71a1 1 0 0 0-.948.683l-2.004 6A1 1 0 0 0 3 22h18a1 1 0 0 0 .948-1.316l-2-6a1 1 0 0 0-.949-.684h-3.712"/></symbol>
+  <symbol id="lucide-heart" viewBox="0 0 24 24"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></symbol>
+  <symbol id="lucide-circle-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></symbol>
+  <symbol id="lucide-toilet" viewBox="0 0 24 24"><path d="M7 12h13a1 1 0 0 1 1 1 5 5 0 0 1-5 5h-.598a.5.5 0 0 0-.424.765l1.544 2.47a.5.5 0 0 1-.424.765H5.402a.5.5 0 0 1-.424-.765L7 18"/><path d="M8 18a5 5 0 0 1-5-5V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8"/></symbol>
+  <symbol id="lucide-message-circle" viewBox="0 0 24 24"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></symbol>
+  <symbol id="lucide-shirt" viewBox="0 0 24 24"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></symbol>
+  <symbol id="lucide-luggage" viewBox="0 0 24 24"><path d="M6 20a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2"/><path d="M8 18V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14"/><path d="M10 20h4"/><circle cx="16" cy="20" r="2"/><circle cx="8" cy="20" r="2"/></symbol>
+  <symbol id="lucide-move-up-right" viewBox="0 0 24 24"><path d="M13 5h6v6"/><path d="M19 5 5 19"/></symbol>
+  <symbol id="lucide-trash-2" viewBox="0 0 24 24"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="lucide-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+  <symbol id="lucide-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
+</svg>
+<div class="app">
+  <header class="topbar">
+    <div class="topline"><div class="title"><svg class="lucide-icon title-wave" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6c3-4 7 4 10 0s7 4 10 0M2 12c3-4 7 4 10 0s7 4 10 0M2 18c3-4 7 4 10 0s7 4 10 0"/></svg><span>CPT-F 购物助手</span></div><button type="button" class="badge" id="settingsBtn" aria-haspopup="dialog" aria-expanded="false">设置</button></div>
+    <div class="stats">
+      <div class="stat"><b id="statSpent">¥0</b><span>已花</span></div>
+      <div class="stat"><b id="statExpected">¥0</b><span>当前预计</span></div>
+      <div class="stat"><b id="statPending">0 件</b><span>尚未购入</span></div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section id="mapView" class="view active">
+      <div class="hall-tabs" id="hallTabs"></div>
+      <div class="card" id="mapCard"></div>
+    </section>
+
+    <section id="listView" class="view">
+      <div class="toolbar">
+        <input class="search" id="searchInput" placeholder="搜索摊位 / 展品 / 社团 / 原作" />
+        <select class="filter" id="statusFilter">
+          <option value="freebie-pending">无料待领取</option><option value="freebie-all">所有无料</option><option value="all" selected>全部</option><option value="pending">待购</option><option value="purchased">已购</option><option value="soldout">完售</option>
+        </select>
+      </div>
+      <div class="booth-list" id="boothList"></div>
+    </section>
+
+    <section id="manageView" class="view">
+      <div class="section-title">从 Excel 导入</div>
+      <div class="card form-card">
+        <div class="filebox">
+          <b>合并 Wishlist</b>
+          <div class="tip">自动识别「摊位号 / 展品名称 / 类型 / 热度 / 筹备状态 / 原作 / 社团名称」。同摊位同名称的现有状态和价格会保留。</div>
+          <input id="excelInput" type="file" accept=".xlsx,.xls" />
+        </div>
+        <div class="tip">请导入CPP心愿单中导出的Excel文件。</div>
+      </div>
+
+      <div class="section-title">直接添加</div>
+      <div class="card form-card">
+        <div class="row2 mobile-stack">
+          <div class="field"><label>摊位号</label><input id="addBooth" placeholder="例如：壹A01 / 创016 / CPC-08 / CPA-08" /></div>
+          <div class="field"><label>社团名称（可选）</label><input id="addCircle" placeholder="例如：AAA测试" /></div>
+        </div>
+        <div class="field"><label>展品名称</label><input id="addName" placeholder="名称" /></div>
+        <div class="row2">
+          <div class="field"><label>价格</label><input id="addPrice" type="number" min="0" step="1" placeholder="¥" /></div>
+          <div class="field"><label>数量</label><input id="addQty" type="number" min="1" step="1" value="1" /></div>
+        </div>
+        <button class="primary" id="addBtn">加入 Wishlist</button>
+      </div>
+
+      <div class="section-title">添加无料摊位</div>
+      <div class="card form-card">
+        <div class="row2 mobile-stack"><div class="field"><label for="freebieBooth">摊位号</label><input id="freebieBooth" maxlength="80" placeholder="例如：壹A01" /></div><div class="field"><label for="freebieCircle">社团名称（可选）</label><input id="freebieCircle" maxlength="200" placeholder="社团名称" /></div></div>
+        <div class="field"><label for="freebieNote">领取条件 / 备注（可选）</label><textarea id="freebieNote" maxlength="300" rows="2" placeholder="例如：关注后领取 / 口令领取"></textarea></div>
+        <button type="button" class="secondary" id="addFreebieBtn">添加无料摊位</button><div class="tip">无需添加商品。已有记录会保留领取状态，填写的备注会更新。</div>
+      </div>
+
+      <div class="section-title">数据备份</div>
+      <div class="card form-card">
+        <div class="row2"><button class="secondary" id="exportBtn">导出 JSON</button><button class="secondary" id="importJsonBtn">导入 JSON</button></div>
+        <input id="jsonInput" type="file" accept="application/json,.json" hidden />
+        <div class="tip">所有购买状态和价格默认只保存在当前浏览器。出发前建议导出一次 JSON 备份。</div>
+      </div>
+
+      <div class="section-title">重置</div>
+      <div class="card form-card"><button class="danger" id="resetBtn">恢复为初始 Wishlist</button></div>
+    </section>
+  </main>
+</div>
+
+<nav class="bottomnav"><div class="nav-inner">
+  <button class="nav-btn active" data-view="map"><span class="nav-icon"><svg class="lucide-icon" aria-hidden="true"><use href="#lucide-map-pinned"></use></svg></span>地图</button>
+  <button class="nav-btn" data-view="list"><span class="nav-icon"><svg class="lucide-icon" aria-hidden="true"><use href="#lucide-heart"></use></svg></span>清单</button>
+  <button class="nav-btn" data-view="manage"><span class="nav-icon"><svg class="lucide-icon" aria-hidden="true"><use href="#lucide-circle-plus"></use></svg></span>添加 / 导入</button>
+</div></nav>
+
+<div class="settings-backdrop" id="settingsBackdrop" aria-hidden="true">
+  <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="grab"></div>
+    <div class="settings-head"><div><h3 id="settingsTitle">设置</h3><p>设置、结算和垃圾桶仅保存在当前浏览器中，可离线使用。</p></div><button type="button" class="close" id="settingsClose" aria-label="关闭设置">×</button></div>
+    <label class="settings-control" for="markerOpacity"><span class="settings-control-title"><b>摊位标记透明度</b><output id="markerOpacityValue">80%</output></span><input id="markerOpacity" type="range" min="20" max="100" step="5" value="80" aria-label="摊位标记透明度"><small>调整 Wishlist 标记底色；编号和无料印章独立保持清晰。点击或聚焦标记时会暂时显示为全清晰。</small></label>
+    <label class="settings-control" for="freebieOpacity"><span class="settings-control-title"><b>无料印章透明度</b><output id="freebieOpacityValue">70%</output></span><input id="freebieOpacity" type="range" min="20" max="100" step="5" value="70" aria-label="无料印章透明度"><small>绿色星形表示待领取，蓝色 ✓ 表示已领取，灰色 × 表示已发完，与商品状态配色一致。数值越小越淡，不影响摊位编号。</small></label>
+    <section class="settings-settlement" aria-labelledby="settlementTitle"><div class="settlement-head"><div><b id="settlementTitle">本次逛展战报</b><small>烟花为每一次收获庆祝</small></div><span class="settlement-status" id="settlementStatus">未结算</span></div><div class="settlement-actions"><button type="button" class="secondary" id="settlementPreview">查看上次战报</button><button type="button" class="primary" id="settlementGenerate">结算时间</button></div><small class="settlement-hint" id="settlementHint">点击即保存当前战报；之后仍可补录并重新结算。</small><div class="settlement-result" id="settlementResult" hidden></div></section>
+    <section class="settings-trash" aria-labelledby="trashTitle"><div class="settings-trash-head"><div><b id="trashTitle">垃圾桶 <span id="trashCount">0件</span></b></div><small>清单左滑的条目保存在这里</small></div><div id="trashList"></div></section>
+    <section class="settings-credits" aria-labelledby="creditsTitle"><b id="creditsTitle">致谢</b><p>单色图标来自 <a href="https://lucide.dev/" target="_blank" rel="noopener noreferrer">Lucide Icons</a>；部分图标源自 Feather Icons。</p><details class="license-details"><summary>查看第三方许可</summary><div class="license-copy" lang="en"><b>Lucide Icons — ISC License</b><p>Copyright (c) 2026 Lucide Icons and Contributors</p><p>Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.</p><p>THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</p><b>Feather Icons — MIT License</b><p>Copyright (c) 2013-present Cole Bemis</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></div></details></section>
+    <section class="settings-credits"><b>结算像素字体</b><p>Fusion Pixel Font · 12px 比例简体中文 · OFL 1.1</p><details class="license-details"><summary>查看字体版权与许可</summary><div class="license-copy"><b>LICENSES/ark-pixel/OFL.txt</b><p>Ark Pixel Font
+https://github.com/TakWolf/ark-pixel-font
+
+Copyright (c) 2021, TakWolf (https://takwolf.com).
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://openfontlicense.org
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+&quot;Font Software&quot; refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+&quot;Reserved Font Name&quot; refers to any names specified as such after the
+copyright statement(s).
+
+&quot;Original Version&quot; refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+&quot;Modified Version&quot; refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+&quot;Author&quot; refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION &amp; CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+</p><b>LICENSES/cubic-11/OFL.txt</b><p>[Cubic 11]
+These fonts are free software.
+Unlimited permission is granted to use, copy, and distribute them, with or without modification, either commercially or noncommercially.
+THESE FONTS ARE PROVIDED &quot;AS IS&quot; WITHOUT WARRANTY.
+此字型是免費的。
+無論您是否進行對本字型進行商業或非商業性修改，均可無限制地使用，複製和分發它們。
+本字型的衍生品之授權必須與此字型相同，且不作任何擔保。
+[JF Dot M+H 12]
+Copyright(c) 2005 M+ FONTS PROJECT
+[M+ BITMAP FONTS]
+Copyright (C) 2002-2004 COZ
+These fonts are free software.
+Unlimited permission is granted to use, copy, and distribute it, with or without modification, either commercially and noncommercially.
+THESE FONTS ARE PROVIDED &quot;AS IS&quot; WITHOUT WARRANTY.
+これらのフォントはフリー（自由な）ソフトウエアです。
+あらゆる改変の有無に関わらず、また商業的な利用であっても、自由にご利用、複製、再配布することができますが、全て無保証とさせていただきます。
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://scripts.sil.org/OFL
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+&quot;Font Software&quot; refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+&quot;Reserved Font Name&quot; refers to any names specified as such after the
+copyright statement(s).
+
+&quot;Original Version&quot; refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+&quot;Modified Version&quot; refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+&quot;Author&quot; refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION &amp; CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+</p><b>LICENSES/galmuri/LICENSE.txt</b><p>Copyright (c) 2019–2025 Lee Minseo (quiple@quiple.dev)
+
+This font software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://openfontlicense.org
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+&quot;Font Software&quot; refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+&quot;Reserved Font Name&quot; refers to any names specified as such after the
+copyright statement(s).
+
+&quot;Original Version&quot; refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+&quot;Modified Version&quot; refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+&quot;Author&quot; refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION &amp; CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+</p><b>OFL.txt</b><p>Fusion Pixel Font
+https://github.com/TakWolf/fusion-pixel-font
+
+Copyright (c) 2022, TakWolf (https://takwolf.com).
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://openfontlicense.org
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+&quot;Font Software&quot; refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+&quot;Reserved Font Name&quot; refers to any names specified as such after the
+copyright statement(s).
+
+&quot;Original Version&quot; refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+&quot;Modified Version&quot; refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+&quot;Author&quot; refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION &amp; CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+</p></div></details></section>
+    <section class="settings-author" aria-labelledby="authorTitle"><b id="authorTitle">作者</b><p>小红书：<a href="https://www.xiaohongshu.com/user/profile/630a9dbb000000001200e9b1?xsec_token=YB15JWNWGqJcnDLKmBwru2xQQw488H_vpOvEM6ZHHMQVs%3D&amp;xsec_source=app_share&amp;xhsshare=&amp;shareRedId=ODkyQTxJRks2NzUyOTgwNjc1OTdJPkg6&amp;apptime=1787200422&amp;share_id=02ca5037cfe34901be3b739e5740ccd5&amp;share_channel=copy_link" target="_blank" rel="noopener noreferrer">TIMINGGGGG</a></p></section>
+    <button type="button" class="primary settings-done" id="settingsDone">完成</button>
+  </section>
+</div>
+<div class="sheet-backdrop" id="sheetBackdrop"><div class="sheet" id="sheet"><div class="grab"></div><div id="sheetContent"></div></div></div>
+<dialog id="importWarningDialog" class="import-warning-dialog" aria-labelledby="importWarningTitle" aria-describedby="importWarningDescription">
+  <h2 id="importWarningTitle">部分摊位号未匹配地图</h2>
+  <p id="importWarningDescription">这些条目已导入清单，但暂时无法在地图上定位。请核对摊位号和所属场次。</p>
+  <ul id="importWarningList"></ul>
+  <form method="dialog"><button class="primary" type="submit">知道了</button></form>
+</dialog>
+<dialog id="battleDialog" class="battle-dialog" aria-labelledby="battleTitle">
+  <div class="grab" aria-hidden="true"></div>
+  <canvas id="fireworksCanvas" aria-hidden="true"></canvas>
+  <div class="battle-toolbar"><span>CP · 离线购物助手</span><div><button type="button" id="skipFireworks" hidden>跳过烟花</button><button type="button" class="close" id="battleClose" aria-label="关闭战报"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button></div></div>
+  <article id="battleReport"></article>
+  <div class="battle-actions"><button type="button" class="primary" id="downloadBattle">保存战报图片</button><button type="button" class="secondary" id="battleDone">返回清单</button></div>
+  <p class="battle-footnote">战报已保存在本机。补录后点击「结算时间」可更新。</p>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+const SEED_ITEMS = [{"id": "seed-test-1", "boothRaw": "壹A01", "name": "test1", "type": "", "heat": null, "prepStatus": "", "source": "", "circle": "AAA测试", "price": null, "qty": 1, "status": "pending", "note": ""}, {"id": "seed-test-2", "boothRaw": "壹A02", "name": "test2", "type": "", "heat": null, "prepStatus": "", "source": "", "circle": "AAA测试", "price": null, "qty": 1, "status": "pending", "note": ""}];
+const EVENT_ID='cpt-f-2026';
+const STORAGE_KEY='cp-offline-shopping:'+EVENT_ID+':v1';
+const STATE_VERSION=6;
+const LEGACY_SEED_ID=/^seed-(?:[1-9]|[1-3]\d|4[0-7])$/;
+const HALL_CHARS={壹:1,贰:2,叁:3,肆:4};
+const HALL_CONFIG={
+  "1": {
+    "blocks": [
+      {
+        "name": "上半区 · H–A",
+        "rows": [
+          "H",
+          "G",
+          "F",
+          "E",
+          "D",
+          "C",
+          "B",
+          "A"
+        ],
+        "capacity": 26,
+        "numbering": "cptf"
+      },
+      {
+        "name": "下半区 · 横排（左 L / M / N，右 I / J / K）",
+        "rows": [
+          "L",
+          "I",
+          "M",
+          "J",
+          "N",
+          "K"
+        ],
+        "capacity": 32,
+        "numbering": "cptf",
+        "orientation": "horizontal",
+        "rowCapacities": {
+          "M": 30,
+          "J": 30,
+          "N": 28,
+          "K": 28
+        }
+      }
+    ],
+    "facility": "左右两侧设卫生间；上方通往 2 号馆，左侧通往 9 号馆与出口",
+    "name": "1号同人馆",
+    "neighbors": [
+      {
+        "hall": 2,
+        "side": "top",
+        "at": 50
+      },
+      {
+        "hall": 9,
+        "side": "left",
+        "at": 40
+      }
+    ],
+    "exits": [
+      {
+        "side": "left",
+        "at": 60
+      }
+    ],
+    "locator": {
+      "mainLeft": 15,
+      "mainWidth": 70,
+      "blockTops": [
+        21,
+        55
+      ],
+      "blockHeight": 25
+    },
+    "facilities": [
+      {
+        "label": "卫生间",
+        "x": 7,
+        "y": 32,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 32,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 80,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 7,
+        "y": 80,
+        "icon": "toilet",
+        "type": "toilet"
+      }
+    ]
+  },
+  "2": {
+    "blocks": [
+      {
+        "name": "上半区 · J–A",
+        "rows": [
+          "J",
+          "I",
+          "H",
+          "G",
+          "F",
+          "E",
+          "D",
+          "C",
+          "B",
+          "A"
+        ],
+        "capacity": 26,
+        "numbering": "cptf"
+      },
+      {
+        "name": "下半区 · R–K",
+        "rows": [
+          "R",
+          "Q",
+          "P",
+          "O",
+          "N",
+          "M",
+          "L",
+          "K"
+        ],
+        "capacity": 30,
+        "numbering": "cptf"
+      }
+    ],
+    "facility": "右上方设补给点与寄包处，右侧中部设咨询台",
+    "name": "2号同人馆",
+    "neighbors": [
+      {
+        "hall": 3,
+        "side": "top",
+        "at": 50
+      },
+      {
+        "hall": 1,
+        "side": "bottom",
+        "at": 50
+      },
+      {
+        "hall": 9,
+        "side": "left",
+        "at": 40
+      }
+    ],
+    "exits": [
+      {
+        "side": "left",
+        "at": 60
+      }
+    ],
+    "locator": {
+      "mainLeft": 15,
+      "mainWidth": 70,
+      "blockTops": [
+        21,
+        55
+      ],
+      "blockHeight": 25
+    },
+    "facilities": [
+      {
+        "label": "卫生间",
+        "x": 7,
+        "y": 32,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 32,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 80,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "补给点",
+        "x": 72,
+        "y": 9,
+        "icon": "utensils",
+        "type": "supply"
+      },
+      {
+        "label": "寄包处",
+        "x": 86,
+        "y": 9,
+        "icon": "luggage",
+        "type": "locker"
+      },
+      {
+        "label": "咨询台",
+        "x": 93,
+        "y": 55,
+        "icon": "message-circle",
+        "type": "consult"
+      }
+    ]
+  },
+  "3": {
+    "blocks": [
+      {
+        "name": "上半区 · H–A",
+        "rows": [
+          "H",
+          "G",
+          "F",
+          "E",
+          "D",
+          "C",
+          "B",
+          "A"
+        ],
+        "capacity": 26,
+        "numbering": "cptf",
+        "rowCapacities": {
+          "H": 28,
+          "E": 24
+        }
+      },
+      {
+        "name": "下半区右侧 · L–I",
+        "rows": [
+          "L",
+          "K",
+          "J",
+          "I"
+        ],
+        "capacity": 18,
+        "numbering": "cptf",
+        "locator": {
+          "left": 47,
+          "top": 55,
+          "width": 25,
+          "height": 25
+        }
+      }
+    ],
+    "special": "创摊一 · 01–84",
+    "exhibition": true,
+    "facility": "左上方设补给点与寄包处；创摊一在下半区左侧，CPA 交流与展览区在右侧",
+    "name": "3号同人馆",
+    "neighbors": [
+      {
+        "hall": 4,
+        "side": "top",
+        "at": 50
+      },
+      {
+        "hall": 2,
+        "side": "bottom",
+        "at": 50
+      },
+      {
+        "hall": 9,
+        "side": "left",
+        "at": 40
+      }
+    ],
+    "exits": [
+      {
+        "side": "left",
+        "at": 60
+      }
+    ],
+    "locator": {
+      "mainLeft": 15,
+      "mainWidth": 57,
+      "blockTops": [
+        21,
+        55
+      ],
+      "blockHeight": 25,
+      "special": {
+        "left": 15,
+        "top": 55,
+        "width": 28,
+        "height": 25
+      },
+      "exhibition": {
+        "left": 76,
+        "top": 48,
+        "width": 19,
+        "height": 24
+      }
+    },
+    "facilities": [
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 32,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 80,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 7,
+        "y": 80,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "补给点",
+        "x": 25,
+        "y": 9,
+        "icon": "utensils",
+        "type": "supply"
+      },
+      {
+        "label": "寄包处",
+        "x": 40,
+        "y": 9,
+        "icon": "luggage",
+        "type": "locker"
+      }
+    ]
+  },
+  "4": {
+    "blocks": [
+      {
+        "name": "上半区 · F–A",
+        "rows": [
+          "F",
+          "E",
+          "D",
+          "C",
+          "B",
+          "A"
+        ],
+        "capacity": 26,
+        "numbering": "cptf"
+      },
+      {
+        "name": "下半区 · N–G",
+        "rows": [
+          "N",
+          "M",
+          "L",
+          "K",
+          "J",
+          "I",
+          "H",
+          "G"
+        ],
+        "capacity": 26,
+        "numbering": "cptf"
+      }
+    ],
+    "facility": "右侧中部设咨询台；下方通往 3 号馆，左侧通往 9 号馆与出口",
+    "name": "4号同人馆",
+    "neighbors": [
+      {
+        "hall": 3,
+        "side": "bottom",
+        "at": 50
+      },
+      {
+        "hall": 9,
+        "side": "left",
+        "at": 40
+      }
+    ],
+    "exits": [
+      {
+        "side": "left",
+        "at": 60
+      }
+    ],
+    "locator": {
+      "mainLeft": 15,
+      "mainWidth": 70,
+      "blockTops": [
+        21,
+        55
+      ],
+      "blockHeight": 25
+    },
+    "facilities": [
+      {
+        "label": "卫生间",
+        "x": 7,
+        "y": 32,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 32,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 93,
+        "y": 80,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "咨询台",
+        "x": 93,
+        "y": 55,
+        "icon": "message-circle",
+        "type": "consult"
+      }
+    ]
+  },
+  "9": {
+    "blocks": [],
+    "enterprise": "企业馆 · CPC",
+    "facility": "医疗点位于 21 号附近，寄包处为 23 号；44 为舞台，47 为美食区",
+    "name": "9号企业馆",
+    "neighbors": [
+      {
+        "hall": 4,
+        "side": "right",
+        "at": 15
+      },
+      {
+        "hall": 3,
+        "side": "right",
+        "at": 36
+      },
+      {
+        "hall": 2,
+        "side": "right",
+        "at": 57
+      },
+      {
+        "hall": 1,
+        "side": "right",
+        "at": 78
+      }
+    ],
+    "exits": [
+      {
+        "side": "right",
+        "at": 88
+      }
+    ],
+    "locator": {
+      "mainLeft": 15,
+      "mainWidth": 70,
+      "blockTops": [
+        21,
+        55
+      ],
+      "blockHeight": 25,
+      "enterprise": {
+        "left": 20,
+        "top": 17,
+        "width": 60,
+        "height": 66
+      }
+    },
+    "facilities": [
+      {
+        "label": "卫生间",
+        "x": 50,
+        "y": 6,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 50,
+        "y": 94,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "医疗点",
+        "x": 92,
+        "y": 43,
+        "icon": "heart",
+        "type": "consult"
+      },
+      {
+        "label": "寄包处 · 23",
+        "x": 92,
+        "y": 60,
+        "icon": "luggage",
+        "type": "locker"
+      },
+      {
+        "label": "卫生间",
+        "x": 92,
+        "y": 24,
+        "icon": "toilet",
+        "type": "toilet"
+      },
+      {
+        "label": "卫生间",
+        "x": 92,
+        "y": 79,
+        "icon": "toilet",
+        "type": "toilet"
+      }
+    ]
+  }
+};
+const SPECIAL_LAYOUTS={
+  "creator": {
+    "title": "3号馆 · 下半区左侧 · 创摊一",
+    "hint": "01–84；左侧独立小组 84、83 / 82 在主矩阵上方",
+    "className": "creator-matrix",
+    "slots": [
+      {
+        "row": 1,
+        "col": 1,
+        "span": 3,
+        "label": "84",
+        "ids": [
+          84
+        ]
+      },
+      {
+        "row": 2,
+        "col": 1,
+        "span": 3,
+        "label": "83 / 82",
+        "ids": [
+          83,
+          82
+        ]
+      },
+      {
+        "row": 3,
+        "col": 1,
+        "span": 3,
+        "label": "73 / 74 / 72 / 71 / 70",
+        "ids": [
+          73,
+          74,
+          72,
+          71,
+          70
+        ]
+      },
+      {
+        "row": 3,
+        "col": 4,
+        "span": 3,
+        "label": "75 / 76 / 77 / 69 / 68",
+        "ids": [
+          75,
+          76,
+          77,
+          69,
+          68
+        ]
+      },
+      {
+        "row": 3,
+        "col": 7,
+        "span": 3,
+        "label": "78 / 79 / 80 / 67 / 66 / 65",
+        "ids": [
+          78,
+          79,
+          80,
+          67,
+          66,
+          65
+        ]
+      },
+      {
+        "row": 3,
+        "col": 10,
+        "span": 3,
+        "label": "81 / 64 / 63 / 62",
+        "ids": [
+          81,
+          64,
+          63,
+          62
+        ]
+      },
+      {
+        "row": 4,
+        "col": 1,
+        "span": 3,
+        "label": "52 / 53 / 54 / 51 / 50",
+        "ids": [
+          52,
+          53,
+          54,
+          51,
+          50
+        ]
+      },
+      {
+        "row": 4,
+        "col": 4,
+        "span": 3,
+        "label": "55 / 56 / 49 / 48 / 47",
+        "ids": [
+          55,
+          56,
+          49,
+          48,
+          47
+        ]
+      },
+      {
+        "row": 4,
+        "col": 7,
+        "span": 3,
+        "label": "57 / 58 / 46 / 45",
+        "ids": [
+          57,
+          58,
+          46,
+          45
+        ]
+      },
+      {
+        "row": 4,
+        "col": 10,
+        "span": 3,
+        "label": "59 / 60 / 61 / 44 / 43 / 42",
+        "ids": [
+          59,
+          60,
+          61,
+          44,
+          43,
+          42
+        ]
+      },
+      {
+        "row": 5,
+        "col": 1,
+        "span": 3,
+        "label": "31 / 32 / 30 / 29 / 28",
+        "ids": [
+          31,
+          32,
+          30,
+          29,
+          28
+        ]
+      },
+      {
+        "row": 5,
+        "col": 4,
+        "span": 3,
+        "label": "33 / 34 / 35 / 27 / 26 / 25",
+        "ids": [
+          33,
+          34,
+          35,
+          27,
+          26,
+          25
+        ]
+      },
+      {
+        "row": 5,
+        "col": 7,
+        "span": 3,
+        "label": "36 / 37 / 38 / 24 / 23 / 22",
+        "ids": [
+          36,
+          37,
+          38,
+          24,
+          23,
+          22
+        ]
+      },
+      {
+        "row": 5,
+        "col": 10,
+        "span": 3,
+        "label": "39 / 40 / 41 / 21 / 20 / 19",
+        "ids": [
+          39,
+          40,
+          41,
+          21,
+          20,
+          19
+        ]
+      },
+      {
+        "row": 6,
+        "col": 1,
+        "span": 3,
+        "label": "11 / 12 / 10 / 09 / 08",
+        "ids": [
+          11,
+          12,
+          10,
+          9,
+          8
+        ]
+      },
+      {
+        "row": 6,
+        "col": 4,
+        "span": 3,
+        "label": "13 / 14 / 15 / 07 / 06 / 05",
+        "ids": [
+          13,
+          14,
+          15,
+          7,
+          6,
+          5
+        ]
+      },
+      {
+        "row": 6,
+        "col": 7,
+        "span": 3,
+        "label": "16 / 17 / 18 / 04 / 03 / 02",
+        "ids": [
+          16,
+          17,
+          18,
+          4,
+          3,
+          2
+        ]
+      },
+      {
+        "row": 6,
+        "col": 10,
+        "span": 3,
+        "label": "01",
+        "ids": [
+          1
+        ]
+      }
+    ]
+  },
+  "enterprise": {
+    "title": "9号企业馆 · CPC",
+    "hint": "按官方图由上往下排列；未标出的 13 号不推定位置",
+    "className": "enterprise-matrix",
+    "slots": [
+      {
+        "row": 1,
+        "col": 4,
+        "span": 6,
+        "label": "01",
+        "ids": [
+          1
+        ]
+      },
+      {
+        "row": 2,
+        "col": 1,
+        "span": 4,
+        "label": "02",
+        "ids": [
+          2
+        ]
+      },
+      {
+        "row": 2,
+        "col": 8,
+        "span": 3,
+        "label": "03",
+        "ids": [
+          3
+        ]
+      },
+      {
+        "row": 3,
+        "col": 7,
+        "span": 2,
+        "label": "08 / 07 / 09 / 10",
+        "ids": [
+          8,
+          7,
+          9,
+          10
+        ]
+      },
+      {
+        "row": 3,
+        "col": 10,
+        "span": 3,
+        "label": "06",
+        "ids": [
+          6
+        ]
+      },
+      {
+        "row": 4,
+        "col": 1,
+        "span": 2,
+        "label": "04",
+        "ids": [
+          4
+        ]
+      },
+      {
+        "row": 4,
+        "col": 4,
+        "span": 2,
+        "label": "14 / 12 / 15",
+        "ids": [
+          14,
+          12,
+          15
+        ]
+      },
+      {
+        "row": 4,
+        "col": 7,
+        "span": 3,
+        "label": "11",
+        "ids": [
+          11
+        ]
+      },
+      {
+        "row": 5,
+        "col": 1,
+        "span": 2,
+        "label": "05",
+        "ids": [
+          5
+        ]
+      },
+      {
+        "row": 5,
+        "col": 4,
+        "span": 2,
+        "label": "17",
+        "ids": [
+          17
+        ]
+      },
+      {
+        "row": 5,
+        "col": 10,
+        "span": 3,
+        "label": "20",
+        "ids": [
+          20
+        ]
+      },
+      {
+        "row": 6,
+        "col": 1,
+        "span": 2,
+        "label": "16",
+        "ids": [
+          16
+        ]
+      },
+      {
+        "row": 6,
+        "col": 4,
+        "span": 2,
+        "label": "18",
+        "ids": [
+          18
+        ]
+      },
+      {
+        "row": 6,
+        "col": 7,
+        "span": 3,
+        "label": "19",
+        "ids": [
+          19
+        ]
+      },
+      {
+        "row": 7,
+        "col": 2,
+        "span": 6,
+        "label": "44 · 舞台",
+        "ids": [
+          44
+        ]
+      },
+      {
+        "row": 7,
+        "col": 10,
+        "span": 3,
+        "label": "21",
+        "ids": [
+          21
+        ]
+      },
+      {
+        "row": 8,
+        "col": 10,
+        "span": 3,
+        "label": "22",
+        "ids": [
+          22
+        ]
+      },
+      {
+        "row": 9,
+        "col": 2,
+        "span": 5,
+        "label": "26 / 25 / 24",
+        "ids": [
+          26,
+          25,
+          24
+        ]
+      },
+      {
+        "row": 9,
+        "col": 8,
+        "span": 2,
+        "label": "40",
+        "ids": [
+          40
+        ]
+      },
+      {
+        "row": 9,
+        "col": 11,
+        "span": 2,
+        "label": "23",
+        "ids": [
+          23
+        ]
+      },
+      {
+        "row": 10,
+        "col": 2,
+        "span": 2,
+        "label": "27",
+        "ids": [
+          27
+        ]
+      },
+      {
+        "row": 10,
+        "col": 5,
+        "span": 3,
+        "label": "28 / 29 / 30",
+        "ids": [
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "row": 11,
+        "col": 9,
+        "span": 4,
+        "label": "31",
+        "ids": [
+          31
+        ]
+      },
+      {
+        "row": 11,
+        "col": 2,
+        "span": 2,
+        "label": "34",
+        "ids": [
+          34
+        ]
+      },
+      {
+        "row": 11,
+        "col": 5,
+        "span": 2,
+        "label": "33",
+        "ids": [
+          33
+        ]
+      },
+      {
+        "row": 12,
+        "col": 2,
+        "span": 2,
+        "label": "35",
+        "ids": [
+          35
+        ]
+      },
+      {
+        "row": 13,
+        "col": 1,
+        "span": 2,
+        "label": "36",
+        "ids": [
+          36
+        ]
+      },
+      {
+        "row": 13,
+        "col": 3,
+        "span": 2,
+        "label": "37",
+        "ids": [
+          37
+        ]
+      },
+      {
+        "row": 13,
+        "col": 5,
+        "span": 2,
+        "label": "38",
+        "ids": [
+          38
+        ]
+      },
+      {
+        "row": 13,
+        "col": 8,
+        "span": 2,
+        "label": "45",
+        "ids": [
+          45
+        ]
+      },
+      {
+        "row": 13,
+        "col": 11,
+        "span": 2,
+        "label": "32",
+        "ids": [
+          32
+        ]
+      },
+      {
+        "row": 14,
+        "col": 1,
+        "span": 3,
+        "label": "42",
+        "ids": [
+          42
+        ]
+      },
+      {
+        "row": 14,
+        "col": 5,
+        "span": 3,
+        "label": "39",
+        "ids": [
+          39
+        ]
+      },
+      {
+        "row": 14,
+        "col": 9,
+        "span": 2,
+        "label": "46",
+        "ids": [
+          46
+        ]
+      },
+      {
+        "row": 14,
+        "col": 11,
+        "span": 2,
+        "label": "41",
+        "ids": [
+          41
+        ]
+      },
+      {
+        "row": 15,
+        "col": 1,
+        "span": 6,
+        "label": "43",
+        "ids": [
+          43
+        ]
+      },
+      {
+        "row": 15,
+        "col": 8,
+        "span": 5,
+        "label": "47 · 美食区",
+        "ids": [
+          47
+        ]
+      }
+    ]
+  },
+  "exhibition": {
+    "title": "3号馆 · CPA 交流与展览区",
+    "hint": "保留官方图明确标出的编号",
+    "className": "enterprise-matrix",
+    "slots": [
+      {
+        "row": 2,
+        "col": 10,
+        "span": 3,
+        "label": "CPA-02 · 交流投稿",
+        "ids": [
+          2
+        ]
+      },
+      {
+        "row": 3,
+        "col": 10,
+        "span": 3,
+        "label": "CPA-01 · 交流投稿",
+        "ids": [
+          1
+        ]
+      },
+      {
+        "row": 4,
+        "col": 10,
+        "span": 3,
+        "label": "CPA-03 · 交流投稿",
+        "ids": [
+          3
+        ]
+      },
+      {
+        "row": 5,
+        "col": 10,
+        "span": 3,
+        "label": "CPA-08 · 无差别同人站",
+        "ids": [
+          8
+        ]
+      },
+      {
+        "row": 6,
+        "col": 1,
+        "span": 3,
+        "label": "CPA-12 · 镖人画展",
+        "ids": [
+          12
+        ]
+      },
+      {
+        "row": 6,
+        "col": 4,
+        "span": 3,
+        "label": "CPA-11 · 幻唐诡梦",
+        "ids": [
+          11
+        ]
+      },
+      {
+        "row": 6,
+        "col": 7,
+        "span": 3,
+        "label": "CPA-10 · 幽·灵",
+        "ids": [
+          10
+        ]
+      },
+      {
+        "row": 6,
+        "col": 10,
+        "span": 3,
+        "label": "CPA-09 · 插画展",
+        "ids": [
+          9
+        ]
+      }
+    ]
+  }
+};
+let state=loadState(); let currentHall=1; let currentView='map';
+
+
+function normalizeFreebies(raw){
+  if(!raw||typeof raw!=='object'||Array.isArray(raw))return {};
+  return Object.fromEntries(Object.entries(raw).filter(([booth,v])=>booth.trim()&&v&&['pending','claimed','unavailable'].includes(v.status)).map(([booth,v])=>[booth,{status:v.status,condition:String(v.condition||'').slice(0,300),circle:String(v.circle||'').slice(0,200)}]));
+}
+function freebieAt(booth){return Object.prototype.hasOwnProperty.call(state.freebies||{},booth)?state.freebies[booth]:null}
+function setFreebie(booth,value){Object.defineProperty(state.freebies,booth,{value,writable:true,enumerable:true,configurable:true})}
+function freebieLabel(status){return {pending:'待领取',claimed:'已领取',unavailable:'已发完'}[status]||''}
+function freebieStamp(booth,mini=false){const f=freebieAt(booth);if(!f)return '';const path=f.status==='claimed'?'<path d="m4 10 4 4 8-8"/>':f.status==='unavailable'?'<path d="m5 5 10 10M15 5 5 15"/>':'<path d="m10 2 2.5 5.1 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8Z"/>';return `<span class="freebie-stamp ${f.status}${mini?' mini':''}" title="无料 · ${freebieLabel(f.status)}" aria-label="无料${freebieLabel(f.status)}"><svg viewBox="0 0 20 20" aria-hidden="true">${path}</svg></span>`}
+function freebieEditor(booth){const f=freebieAt(booth);return `<section class="freebie-editor"><div class="freebie-heading"><b>无料领取</b>${freebieStamp(booth)}</div><div class="freebie-options">${[['none','未标记'],['pending','待领取'],['claimed','✓ 已领取'],['unavailable','× 已发完']].map(([value,label])=>`<button type="button" data-freebie-status="${value}" aria-pressed="${(f?.status||'none')===value}">${label}</button>`).join('')}</div>${f?`<label class="freebie-condition-label" for="freebieCondition">领取条件 / 备注</label><textarea id="freebieCondition" maxlength="300" rows="2" placeholder="例如：关注社团后领取 / 对口令">${esc(f.condition)}</textarea><small>无料领取与商品购买分别记录，备注自动保存。</small>`:'<small>该摊位有无料时，选择「待领取」开始记录。</small>'}</section>`}
+function bindFreebieEditor(booth){
+  document.querySelectorAll('[data-freebie-status]').forEach(button=>button.onclick=()=>{
+    const status=button.dataset.freebieStatus,previous=freebieAt(booth);
+    if(status==='none')delete state.freebies[booth];
+    else setFreebie(booth,{status,condition:previous?.condition||'',circle:previous?.circle||''});
+    saveState();renderList();renderMap();
+    if(groups().some(g=>g.booth===booth)){openBooth(booth);document.querySelector(`[data-freebie-status="${status}"]`)?.focus();if(status==='claimed')document.querySelector('.freebie-editor .freebie-stamp')?.classList.add('stamp-pop')}
+    else closeSheet();
+  });
+  const note=document.getElementById('freebieCondition');if(note)note.oninput=()=>{const f=freebieAt(booth);if(f){f.condition=note.value;saveState();renderList()}};
+}
+
+function cloneSeedFreebies(){return {'壹A01':{status:'pending',condition:'',circle:'AAA测试'}}}
+function cloneSeed(){return SEED_ITEMS.map(x=>({...x}));}
+function clampMarkerOpacity(value){const n=Number(value);return Number.isFinite(n)?Math.max(20,Math.min(100,Math.round(n/5)*5)):80}
+function applyMarkerOpacity(value){const n=clampMarkerOpacity(value);state.markerOpacity=n;document.documentElement.style.setProperty('--marker-opacity',String(n/100));const output=document.getElementById('markerOpacityValue');if(output)output.textContent=n+'%';const input=document.getElementById('markerOpacity');if(input&&Number(input.value)!==n)input.value=n;return n}
+function clampFreebieOpacity(value){return value==null?70:clampMarkerOpacity(value)}
+function applyFreebieOpacity(value){const n=clampFreebieOpacity(value);state.freebieOpacity=n;document.documentElement.style.setProperty('--freebie-opacity',String(n/100));document.getElementById('freebieOpacityValue').textContent=n+'%';document.getElementById('freebieOpacity').value=n;return n}
+function normalizeState(raw){const base=raw&&typeof raw==='object'?raw:{},oldVersion=Number(base.version)||1;let items=Array.isArray(base.items)?base.items.map(i=>({...i})):[],trash=Array.isArray(base.trash)?base.trash.map(i=>({...i})):[],settlement=base.settlement&&typeof base.settlement==='object'?{...base.settlement}:null;if(settlement)delete settlement.eventEndAt;if(oldVersion<2){items=items.filter(i=>!LEGACY_SEED_ID.test(String(i.id||'')));trash=trash.filter(i=>!LEGACY_SEED_ID.test(String(i.id||'')));}const next={...base,items,trash,version:STATE_VERSION,eventId:EVENT_ID,demoSeedsInitialized:true,demoFreebieInitialized:true,freebieOpacity:clampFreebieOpacity(base.freebieOpacity),markerOpacity:clampMarkerOpacity(base.markerOpacity),settlement,freebies:normalizeFreebies(base.freebies)};delete next.eventEndAt;return next}
+function loadState(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s&&Array.isArray(s.items)){const next=normalizeState(s);if(!s.demoSeedsInitialized){for(const seed of cloneSeed())if(![...next.items,...next.trash].some(i=>i.id===seed.id||(i.boothRaw===seed.boothRaw&&i.name===seed.name)))next.items.push(seed)}if(!s.demoFreebieInitialized&&!Object.prototype.hasOwnProperty.call(next.freebies,'壹A01')&&next.items.some(i=>i.boothRaw==='壹A01'&&(i.id==='seed-test-1'||i.name==='test1')))next.freebies['壹A01']=cloneSeedFreebies()['壹A01'];localStorage.setItem(STORAGE_KEY,JSON.stringify(next));return next}}catch(e){} return {items:cloneSeed(),trash:[],version:STATE_VERSION,eventId:EVENT_ID,demoSeedsInitialized:true,demoFreebieInitialized:true,freebieOpacity:70,markerOpacity:80,settlement:null,freebies:cloneSeedFreebies()};}
+function saveState(){applyFreebieOpacity(state.freebieOpacity);applyMarkerOpacity(state.markerOpacity);localStorage.setItem(STORAGE_KEY,JSON.stringify(state));renderStats();}
+function money(v){return '¥'+Math.round(v||0).toLocaleString('zh-CN')}
+function knownPrice(i){return i.price!==null && i.price!==undefined && String(i.price).trim()!=='' && Number.isFinite(Number(i.price)) && Number(i.price)>=0}
+function itemCost(i){return knownPrice(i)?Number(i.price)*(Number(i.qty)||1):0}
+function statusLabel(s){return s==='purchased'?'已购入':s==='soldout'?'已完售':'尚未购入'}
+function boothStatus(items){return items.some(i=>i.status==='pending')?'pending':'done'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+const LUCIDE_ICON_NAMES=new Set(['star','map-pinned','heart','circle-plus','toilet','message-circle','shirt','luggage','move-up-right','trash-2','utensils','pencil']);
+function iconSvg(name,className=''){if(!LUCIDE_ICON_NAMES.has(name))return '';return `<svg class="lucide-icon${className?' '+className:''}" aria-hidden="true"><use href="#lucide-${name}"></use></svg>`}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1800)}
+function uid(){return 'i-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
+
+function moveToTrash(id){const index=state.items.findIndex(i=>i.id===id);if(index<0)return;const [item]=state.items.splice(index,1);state.trash.unshift({...item,deletedAt:Date.now()});saveState();renderList();renderMap();renderTrash();toast(`“${item.name}”已放入垃圾桶`)}
+function restoreTrashItem(id){const index=state.trash.findIndex(i=>i.id===id);if(index<0)return;const [item]=state.trash.splice(index,1);delete item.deletedAt;if(state.items.some(i=>i.id===item.id))item.id=uid();state.items.push(item);saveState();renderTrash();renderList();renderMap();toast(`“${item.name}”已恢复`)}
+function permanentlyDeleteTrashItem(id){const item=state.trash.find(i=>i.id===id);if(!item||!confirm(`彻底删除“${item.name}”？此操作无法恢复。`))return;state.trash=state.trash.filter(i=>i.id!==id);saveState();renderTrash();toast('条目已彻底删除')}
+function renderTrash(){const list=document.getElementById('trashList'),count=document.getElementById('trashCount');if(!list||!count)return;const items=state.trash||[];count.textContent=`${items.length}件`;if(!items.length){list.innerHTML='<div class="trash-empty">垃圾桶为空</div>';return}list.innerHTML=`<div class="trash-list">${items.map(i=>`<div class="trash-item"><div class="trash-copy"><b>${esc(i.name)}</b><span>${esc(i.boothRaw)}${i.circle?' · '+esc(i.circle):''}</span></div><div class="trash-actions"><button type="button" class="trash-restore" data-trash-restore="${esc(i.id)}">恢复</button><button type="button" class="trash-delete" data-trash-delete="${esc(i.id)}">彻底删除</button></div></div>`).join('')}</div>`;list.querySelectorAll('[data-trash-restore]').forEach(b=>b.onclick=()=>restoreTrashItem(b.dataset.trashRestore));list.querySelectorAll('[data-trash-delete]').forEach(b=>b.onclick=()=>permanentlyDeleteTrashItem(b.dataset.trashDelete))}
+function bindSwipeRows(root){root.querySelectorAll('[data-swipe-row]').forEach(row=>{let active=false,dragging=false,startX=0,startY=0,offset=0,pointerId=null;const reset=()=>{row.classList.remove('swiping');row.style.transform=''};row.addEventListener('pointerdown',e=>{if(e.target.closest('input,button'))return;active=true;dragging=false;startX=e.clientX;startY=e.clientY;offset=0;pointerId=e.pointerId;try{row.setPointerCapture(pointerId)}catch(_){}});row.addEventListener('pointermove',e=>{if(!active||e.pointerId!==pointerId)return;const dx=e.clientX-startX,dy=e.clientY-startY;if(!dragging&&Math.max(Math.abs(dx),Math.abs(dy))>8){if(Math.abs(dy)>=Math.abs(dx)){active=false;reset();return}dragging=true;row.classList.add('swiping')}if(!dragging)return;offset=Math.max(-112,Math.min(0,dx));row.style.transform=`translateX(${offset}px)`;if(e.cancelable)e.preventDefault()});const finish=e=>{if(!active||e.pointerId!==pointerId)return;active=false;try{row.releasePointerCapture(pointerId)}catch(_){}if(dragging&&offset<=-70){row.classList.remove('swiping');row.style.transform='translateX(-100%)';setTimeout(()=>moveToTrash(row.dataset.swipeRow),130)}else reset()};row.addEventListener('pointerup',finish);row.addEventListener('pointercancel',e=>{if(e.pointerId!==pointerId)return;active=false;reset()})})}
+
+function parseBooth(raw){
+  raw=String(raw||'').trim();const code=raw.toUpperCase().replace(/\s+/g,'').replace(/[－–—]/g,'-');
+  const unknown={type:'unknown',hall:null,raw,label:raw};
+  const creator=code.match(/^(?:叁|3)?创(?:摊一?)?-?(\d{1,3})$/);
+  if(creator){const number=Number(creator[1]);return number>=1&&number<=84?{type:'creator',hall:3,number,raw,label:raw}:unknown}
+  const special=code.match(/^(?:(?:玖|9)?(CPC|企)|(?:叁|3)?(CPA))-?(\d{1,2})$/);
+  if(special){const type=special[2]?'exhibition':'enterprise',number=Number(special[3]);return SPECIAL_LAYOUTS[type].slots.some(s=>s.ids.includes(number))?{type,hall:type==='enterprise'?9:3,number,raw,label:raw}:unknown}
+  const m=code.match(/^([壹贰叁肆1234])([A-Z])(\d{1,2})(?:[-/、](?:([壹贰叁肆1234])?([A-Z])?)?(\d{1,2}))?$/);
+  if(!m)return unknown;
+  const hall=HALL_CHARS[m[1]]||Number(m[1]),row=m[2],start=Math.min(Number(m[3]),Number(m[6]||m[3])),end=Math.max(Number(m[3]),Number(m[6]||m[3]));
+  if((m[4]&&(HALL_CHARS[m[4]]||Number(m[4]))!==hall)||(m[5]&&m[5]!==row)||start<1||end>aisleCapacity(hall,row))return unknown;
+  return {type:'standard',hall,row,start,end,raw,label:row+String(start).padStart(2,'0')+(end>start?'–'+String(end).padStart(2,'0'):'')};
+}
+function hallOfItem(i){return parseBooth(i.boothRaw).hall}
+function groups(){
+  const m=new Map(); for(const i of state.items){const k=i.boothRaw||'未填写';if(!m.has(k))m.set(k,[]);m.get(k).push(i)}
+  for(const booth of Object.keys(state.freebies||{}))if(!m.has(booth))m.set(booth,[]);
+  return [...m.entries()].map(([booth,items])=>({booth,items,parsed:parseBooth(booth),status:boothStatus(items)==='pending'||freebieAt(booth)?.status==='pending'?'pending':'done'}));
+}
+function boothSort(a,b){const pa=a.parsed,pb=b.parsed; if((pa.hall||99)!==(pb.hall||99))return (pa.hall||99)-(pb.hall||99); if(pa.type!==pb.type)return pa.type==='standard'?-1:1; if(pa.row!==pb.row)return String(pa.row||'').localeCompare(String(pb.row||'')); return (pa.start||pa.number||0)-(pb.start||pb.number||0)}
+function circleOfGroup(g){return g.items.map(i=>String(i.circle||'').trim()).find(Boolean)||freebieAt(g.booth)?.circle||'未填写社团'}
+function groupCountText(g){const pending=g.items.filter(i=>i.status==='pending').length;const f=freebieAt(g.booth);return g.items.length?`${g.items.length}条·${pending?`待购${pending}`:f?.status==='pending'?'待领':'完成'}`:freebieLabel(f?.status)}
+
+function renderStats(){
+  const spent=state.items.filter(i=>i.status==='purchased').reduce((a,i)=>a+itemCost(i),0);
+  const expected=state.items.filter(i=>i.status!=='soldout').reduce((a,i)=>a+itemCost(i),0);
+  const pending=state.items.filter(i=>i.status==='pending').length;
+  const missing=state.items.filter(i=>i.status!=='soldout'&&!knownPrice(i)).length;
+  document.getElementById('statSpent').textContent=money(spent);
+  document.getElementById('statExpected').textContent=money(expected)+(missing?` · ${missing}待补价`:'');
+  document.getElementById('statPending').textContent=pending+' 件';
+}
+function settlementSnapshot(){
+  const items=state.items||[],purchased=items.filter(i=>i.status==='purchased'),freebies=Object.values(state.freebies||{});
+  return {reportVersion:1,eventName:'CPT-F',createdAt:new Date().toISOString(),total:items.length,purchased:purchased.length,purchasedQty:purchased.reduce((n,i)=>n+Math.max(1,Number(i.qty)||1),0),purchasedBooths:new Set(purchased.map(i=>i.boothRaw)).size,soldout:items.filter(i=>i.status==='soldout').length,pending:items.filter(i=>i.status==='pending').length,spent:purchased.reduce((n,i)=>n+itemCost(i),0),purchasedMissingPrice:purchased.filter(i=>!knownPrice(i)).length,freebieTotal:freebies.length,freebieClaimed:freebies.filter(f=>f.status==='claimed').length,freebiePending:freebies.filter(f=>f.status==='pending').length,freebieUnavailable:freebies.filter(f=>f.status==='unavailable').length,trash:(state.trash||[]).length};
+}
+function dateTimeText(value){const d=new Date(value);return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(d):'时间未知'}
+function battleAchievements(s){return [
+  {name:'心愿达成',tone:'wish',detail:'至少购入一件心愿商品',earned:s.purchased>=1},
+  {name:'无料收藏家',tone:'gift',detail:'至少领取一摊无料',earned:s.freebieClaimed>=1},
+  {name:'账本整理完毕',tone:'ledger',detail:'有购入商品，且已购商品全部填价',earned:s.purchased>=1&&s.purchasedMissingPrice===0}
+]}
+function battleMetrics(s){return [
+  [s.purchasedQty??s.purchased,s.purchasedQty===undefined?'已购条目':'购入件数'],
+  [s.purchasedBooths??'—','有购入的摊位'],
+  [s.freebieClaimed??'—','无料已领'],
+  [money(s.spent),'已记录花费']
+]}
+function renderSettlement(){
+  const s=state.settlement,button=document.getElementById('settlementPreview');button.disabled=!s;
+  document.getElementById('settlementStatus').textContent=s?'已保存战报':'未结算';
+  document.getElementById('settlementStatus').classList.toggle('done',!!s);
+  document.getElementById('settlementHint').textContent=s?`上次结算 ${dateTimeText(s.createdAt)}；点击「结算时间」更新战报。`:'点击即保存当前战报；之后仍可补录并重新结算。';
+}
+const BATTLE_TITLE_LETTERS=[
+  {char:'本',color:'#df3152',angle:-9,lift:1},
+  {char:'次',color:'#c96710',angle:5,lift:-2},
+  {char:'探',color:'#a98206',angle:-5,lift:2},
+  {char:'索',color:'#219351',angle:7,lift:-1},
+  {char:'完',color:'#1977c9',angle:-6,lift:1},
+  {char:'成',color:'#5d50cf',angle:4,lift:-2},
+  {char:'！',color:'#a73bba',angle:10,lift:0}
+];
+function battleTitleMarkup(){return BATTLE_TITLE_LETTERS.map(letter=>`<span aria-hidden="true" style="color:${letter.color};transform:translateY(${letter.lift}px) rotate(${letter.angle}deg)">${letter.char}</span>`).join('')}
+function battleDecorations(s){
+  let seed=String(s.createdAt||'CP').split('').reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
+  const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+  const colors=['#e94885','#397fe5','#b179df','#e9a12b'],decorations=[];
+  // Sample across the full blank strips, with enough separation for small screens.
+  for(const edge of ['top','bottom']){
+    const first=.08+random()*.84;
+    const candidates=Array.from({length:32},()=>.08+random()*.84);
+    const second=candidates.find(x=>Math.abs(x-first)>.28)??(first>.5?.1:.9);
+    for(const x of [first,second])decorations.push({x,edge,offset:20+random()*8,size:26+random()*10,color:colors[decorations.length],angle:random()*Math.PI});
+  }
+  return decorations;
+}
+function fireworkRays(d){return Array.from({length:12},(_,i)=>{const a=i*Math.PI/6+d.angle;return [Math.cos(a)*8,Math.sin(a)*8,Math.cos(a)*17,Math.sin(a)*17]})}
+function battleDecorationMarkup(s){return battleDecorations(s).map(d=>`<svg class="battle-decoration" aria-hidden="true" viewBox="-22 -22 44 44" style="left:${d.x*100}%;${d.edge}:${d.offset}px;width:${d.size}px;height:${d.size}px;color:${d.color}">${fireworkRays(d).map(([x1,y1,x2,y2])=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`).join('')}<circle r="2" fill="currentColor"/></svg>`).join('')}
+function drawBattleDecorations(c,s){for(const d of battleDecorations(s)){c.save();c.translate(d.x*900,d.edge==='top'?d.offset+5:595-d.offset);c.scale(d.size/22,d.size/22);c.globalAlpha=.55;c.strokeStyle=d.color;c.lineWidth=1.7;c.lineCap='round';for(const [x1,y1,x2,y2] of fireworkRays(d)){c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke()}c.restore()}}
+function battleMarkup(s){return `${battleDecorationMarkup(s)}<header class="battle-hero"><p class="battle-eyebrow">${esc(s.eventName||'CPT-F')} · 本次逛展战报</p><h2 id="battleTitle" aria-label="本次探索完成！">${battleTitleMarkup()}</h2><time>${dateTimeText(s.createdAt)}</time></header>
+  <div class="battle-metrics">${battleMetrics(s).map(([value,label])=>`<div><strong style="--metric-size:${String(value).length>6?18:24}px">${esc(value)}</strong><span>${esc(label)}</span></div>`).join('')}</div>
+  ${battleAchievements(s).some(a=>a.earned)?`<div class="battle-tags">${battleAchievements(s).filter(a=>a.earned).map(a=>`<span class="battle-tag tone-${a.tone}">#${esc(a.name)}</span>`).join('')}</div>`:''}
+`}
+let activeBattle=null,fireworkFrame=0,battleReturnTarget=null,battleBodyOverflow='';
+function openBattleReport(fresh){
+  const dialog=document.getElementById('battleDialog');if(dialog.open)return;
+  const snapshot=fresh?settlementSnapshot():state.settlement;if(!snapshot)return;
+  if(fresh){const previous=state.settlement;state.settlement=snapshot;try{saveState()}catch(error){state.settlement=previous;toast('保存失败，请先导出备份并检查存储空间');return}}
+  activeBattle=JSON.parse(JSON.stringify(snapshot));renderSettlement();
+  document.getElementById('battleReport').innerHTML=battleMarkup(activeBattle);
+  battleReturnTarget=document.activeElement;battleBodyOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+  dialog.showModal();dialog.scrollTop=0;document.getElementById('battleClose').focus();
+  if(fresh)startFireworks();
+}
+function stopFireworks(){cancelAnimationFrame(fireworkFrame);fireworkFrame=0;const canvas=document.getElementById('fireworksCanvas');canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);canvas.hidden=true;document.getElementById('skipFireworks').hidden=true}
+function closeBattleReport(){document.getElementById('battleDialog').close()}
+function startFireworks(){
+  stopFireworks();if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const canvas=document.getElementById('fireworksCanvas'),ctx=canvas.getContext('2d'),width=window.innerWidth,height=window.innerHeight,dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=width*dpr;canvas.height=height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);canvas.hidden=false;document.getElementById('skipFireworks').hidden=false;
+  const colors=['#d65a79','#8659ca','#3280c5','#d18b27','#269982','#cb64aa'];
+  // Seven overlapping volleys, with three layered blooms in each volley.
+  const bursts=Array.from({length:21},(_,i)=>({
+    x:[.18,.51,.81,.32,.72,.49,.85][i%7],y:[.25,.46,.31,.59,.18,.39,.53][(i*3)%7],
+    at:Math.floor(i/3)*480+(i%3)*95,color:colors[i%colors.length],inner:colors[(i+2)%colors.length],phase:i*.37
+  })),start=performance.now();
+  function frame(now){
+    const elapsed=now-start;ctx.clearRect(0,0,width,height);
+    for(const burst of bursts){
+      const age=elapsed-burst.at;if(age<0||age>1700)continue;
+      const x=burst.x*width,y=burst.y*height;ctx.strokeStyle=burst.color;ctx.fillStyle=burst.color;
+      if(age<350){
+        const p=age/350,rocketY=height-(height-y)*p;ctx.globalAlpha=.8;ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(x,rocketY+42);ctx.lineTo(x,rocketY);ctx.stroke();ctx.beginPath();ctx.arc(x,rocketY,2.5,0,Math.PI*2);ctx.fill();
+      }else{
+        const t=(age-350)/1350,radius=Math.min(width*.28,150)*(1-Math.pow(1-t,3));ctx.lineWidth=1.8;
+        for(let i=0;i<56;i++){
+          const angle=i*Math.PI*2/56+burst.phase,scale=i%2?.60:1;
+          const px=x+Math.cos(angle)*radius*scale,py=y+Math.sin(angle)*radius*scale+t*t*65;
+          ctx.globalAlpha=(1-t)*.88;ctx.strokeStyle=i%2?burst.inner:burst.color;ctx.fillStyle=ctx.strokeStyle;
+          ctx.beginPath();ctx.moveTo(px-Math.cos(angle)*13*(1-t),py-Math.sin(angle)*13*(1-t));ctx.lineTo(px,py);ctx.stroke();
+          ctx.beginPath();ctx.arc(px,py,i%4===0?2:1.3,0,Math.PI*2);ctx.fill();
+          if(i%4===0&&t>.2){ctx.globalAlpha=(1-t)*.65;ctx.beginPath();ctx.arc(px-Math.cos(angle)*9,py+7,1,0,Math.PI*2);ctx.fill()}
+        }
+      }
+    }
+    ctx.globalAlpha=1;if(elapsed<4800)fireworkFrame=requestAnimationFrame(frame);else stopFireworks();
+  }
+  fireworkFrame=requestAnimationFrame(frame);
+}
+async function downloadBattleReport(){
+  if(!activeBattle)return;const s=activeBattle,button=document.getElementById('downloadBattle');button.disabled=true;
+  try{
+    await document.fonts.load('24px "CP Fusion Pixel"','本次探索完成！0123456789');
+    const canvas=document.createElement('canvas');canvas.width=900;canvas.height=600;const c=canvas.getContext('2d');
+    c.fillStyle='#fff';c.fillRect(0,0,900,600);drawBattleDecorations(c,s);
+    const text=(value,x,y,size=24,color='#15171a',align='left',maxWidth=760)=>{c.font=`400 ${size}px "CP Fusion Pixel", sans-serif`;c.fillStyle=color;c.textAlign=align;c.fillText(String(value),x,y,maxWidth)};
+    text(`${s.eventName||'CPT-F'} · 本次逛展战报`,450,90,24,'#8166a1','center');
+    c.font='400 60px "CP Fusion Pixel", sans-serif';
+    const titleWidths=BATTLE_TITLE_LETTERS.map(letter=>c.measureText(letter.char).width+14);let titleX=(900-titleWidths.reduce((sum,w)=>sum+w,0))/2;
+    BATTLE_TITLE_LETTERS.forEach((letter,i)=>{c.save();c.translate(titleX+titleWidths[i]/2,165+letter.lift*2);c.rotate(letter.angle*Math.PI/180);c.fillStyle=letter.color;c.textAlign='center';c.fillText(letter.char,0,20);c.restore();titleX+=titleWidths[i]});
+    text(dateTimeText(s.createdAt),450,237,24,'#69707a','center');
+    battleMetrics(s).forEach(([value,label],i)=>{const x=150+i*200;text(value,x,328,String(value).length>6?36:48,'#15171a','center',180);text(label,x,369,24,'#69707a','center',180)});
+    const achievements=battleAchievements(s).filter(a=>a.earned),tags=achievements.map(a=>'#'+a.name);c.font='400 36px "CP Fusion Pixel", sans-serif';
+    const tagColors={wish:'#d92765',gift:'#2563df',ledger:'#7938d2'};
+    const widths=tags.map(tag=>c.measureText(tag).width),totalWidth=widths.reduce((sum,w)=>sum+w,0)+Math.max(0,tags.length-1)*28;let tagX=(900-totalWidth)/2;
+    tags.forEach((tag,i)=>{text(tag,tagX+widths[i]/2,458,36,tagColors[achievements[i].tone],'center');tagX+=widths[i]+28});
+    text('CP 离线购物助手',450,556,24,'#69707a','center');
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error('image');const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${s.eventName||'CP'}_逛展战报_${String(s.createdAt).slice(0,10)}.png`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }catch(error){toast('图片生成失败，可以先截屏保存战报')}finally{button.disabled=false}
+}
+document.getElementById('battleClose').onclick=closeBattleReport;
+document.getElementById('battleDone').onclick=()=>{closeBattleReport();closeSettings();setView('list');document.getElementById('searchInput').focus()};
+document.getElementById('skipFireworks').onclick=()=>{stopFireworks();document.getElementById('battleClose').focus()};
+document.getElementById('downloadBattle').onclick=downloadBattleReport;
+document.getElementById('battleDialog').addEventListener('close',()=>{stopFireworks();document.body.style.overflow=battleBodyOverflow;battleReturnTarget?.focus();activeBattle=null});
+
+function renderHallTabs(){const el=document.getElementById('hallTabs'),tabs=['overview',1,2,3,4,9];el.innerHTML=tabs.map(h=>`<button class="hall-tab ${h===currentHall?'active':''}" data-hall="${h}">${h==='overview'?'总览':h+'号馆'}</button>`).join('');el.querySelectorAll('button').forEach(b=>b.onclick=()=>{currentHall=b.dataset.hall==='overview'?'overview':Number(b.dataset.hall);renderHallTabs();renderMap()})}
+function aisleCapacity(hall,row){for(const b of HALL_CONFIG[hall]?.blocks||[])if(b.rows.includes(row))return b.rowCapacities?.[row]||b.capacity;return 0}
+function aisleNumberLayout(block){
+  const cap=block.capacity,half=cap/2;
+  if(block.numbering==='cptf')return {leftTop:cap,leftBottom:half+1,rightTop:1,rightBottom:half,locate(n){return n<=half?{side:'right',p:(n-1)/(half-1)}:{side:'left',p:(cap-n)/(half-1)}}};
+  if(block.numbering==='splitTopLowLeft')return {leftTop:half,leftBottom:1,rightTop:half+1,rightBottom:cap,locate(n){return n<=half?{side:'left',p:(half-n)/(half-1)}:{side:'right',p:(n-(half+1))/(cap-(half+1))}}};
+  if(block.numbering==='edgeTopLowLeft')return {leftTop:1,leftBottom:half,rightTop:cap,rightBottom:half+1,locate(n){return n<=half?{side:'left',p:(n-1)/(half-1)}:{side:'right',p:(cap-n)/(cap-(half+1))}}};
+  return {leftTop:half+1,leftBottom:cap,rightTop:half,rightBottom:1,locate(n){return n<=half?{side:'right',p:(half-n)/(half-1)}:{side:'left',p:(n-(half+1))/(cap-(half+1))}}};
+}
+function markerPos(parsed,block){return aisleNumberLayout(block).locate((parsed.start+parsed.end)/2)}
+function markerLayout(rowGroups,block){
+  const out=new Map(),bySide={left:[],right:[]};
+  for(const g of rowGroups){const pos=markerPos(g.parsed,block),pc=Math.max(0,Math.min(1,pos.p));bySide[pos.side].push({g,side:pos.side,target:30+pc*239,top:0})}
+  for(const arr of Object.values(bySide)){
+    arr.sort((a,b)=>a.target-b.target);const gap=35,minTop=55,maxTop=243;
+    let cursor=minTop-gap;for(const m of arr){m.top=Math.max(m.target,cursor+gap,minTop);cursor=m.top}
+    if(arr.length&&arr[arr.length-1].top>maxTop){arr[arr.length-1].top=maxTop;for(let i=arr.length-2;i>=0;i--)arr[i].top=Math.min(arr[i].top,arr[i+1].top-gap)}
+    for(const m of arr)out.set(m.g.booth,m)
+  }
+  return out
+}
+function shoppingState(gs){
+  const pending=gs.filter(g=>g.status==='pending').length,done=gs.length-pending;
+  return {tone:!gs.length?'gray':pending?'pending':'done',label:!gs.length?'无意向':pending?`${pending} 待去${done?' · '+done+' 已处理':''}`:`${done} 已处理`};
+}
+function shoppingLegend(){return '<div class="legend"><span><i class="dot gray"></i>无意向</span><span><i class="dot pending"></i>待购 / 待领</span><span><i class="dot done"></i>已处理</span></div>'}
+function navigationStatus(s){return `<small class="navigation-status"><i class="dot ${s.tone}"></i>${s.label}</small>`}
+function renderFacilityLocator(cfg){
+  const hallGroups=groups().filter(g=>g.parsed.hall===currentHall);
+  if(!cfg.facilities?.length)return '';
+  const pins=cfg.facilities.map(f=>{const edge=f.x<=10?' edge-left':f.x>=90?' edge-right':'';return `<span class="facility-pin ${esc(f.type)}${edge}" style="left:${f.x}%;top:${f.y}%" title="${esc(f.label)}">${iconSvg(f.icon)}<b>${esc(f.display||f.label)}</b></span>`}).join('');
+  const routeLabel=(side,label)=>`<span class="route-arrow" aria-hidden="true">${side==='left'?'←':side==='right'?'→':side==='top'?'↑':'↓'}</span><span>${label}</span>`;
+  const routeStyle=r=>{const at=r.at??50,side=r.side||'right';return {side,style:side==='top'||side==='bottom'?`left:${at}%`:`top:${at}%`}};
+  const neighbors=(cfg.neighbors||[]).map(n=>{const {side,style}=routeStyle(n),label=`${n.hall}号馆`;return `<button type="button" class="facility-neighbor ${side}" data-neighbor-hall="${n.hall}" aria-label="切换到${label}" style="${style}">${routeLabel(side,label)}</button>`}).join('');
+  const exits=(cfg.exits||[]).map(e=>{const {side,style}=routeStyle(e);return `<span class="facility-neighbor exit ${side}" aria-label="出口位于${side==='left'?'左侧':side==='right'?'右侧':side==='top'?'上方':'下方'}" style="${style}">${routeLabel(side,'出口')}</span>`}).join('');
+  const locator=cfg.locator||{},mainLeft=locator.mainLeft??8,mainWidth=locator.mainWidth??84,blockTops=locator.blockTops||[18,52],blockHeight=locator.blockHeight??24;
+  const zones=cfg.blocks.map((block,i)=>{const label=block.name.replace(/\s*（.*?）/g,''),status=shoppingState(hallGroups.filter(g=>g.parsed.type==='standard'&&block.rows.includes(g.parsed.row)));return `<button type="button" class="facility-zone shopping-${status.tone}" data-map-target="hall-${currentHall}-block-${i}" aria-label="跳转到${esc(label)}详细地图" style="left:${block.locator?.left??mainLeft}%;top:${block.locator?.top??blockTops[i]??blockTops[blockTops.length-1]}%;width:${block.locator?.width??mainWidth}%;height:${block.locator?.height??blockHeight}%"><span>${esc(label)}</span>${navigationStatus(status)}</button>`});
+  if(cfg.special){const status=shoppingState(hallGroups.filter(g=>g.parsed.type==='creator')),r=locator.special||{left:75,top:18,width:17,height:58};zones.push(`<button type="button" class="facility-zone side creator shopping-${status.tone}" data-map-target="hall-${currentHall}-creator" aria-label="跳转到${esc(cfg.special)}详细地图" style="left:${r.left}%;top:${r.top}%;width:${r.width}%;height:${r.height}%"><span>${esc(cfg.special)}</span>${navigationStatus(status)}</button>`)}
+  if(cfg.enterprise){const status=shoppingState(hallGroups.filter(g=>g.parsed.type==='enterprise')),r=locator.enterprise||{left:18,top:18,width:12,height:58};zones.push(`<button type="button" class="facility-zone side enterprise shopping-${status.tone}" data-map-target="hall-${currentHall}-enterprise" aria-label="跳转到${esc(cfg.enterprise)}详细地图" style="left:${r.left}%;top:${r.top}%;width:${r.width}%;height:${r.height}%"><span>${esc(cfg.enterprise)}</span>${navigationStatus(status)}</button>`)}
+  if(cfg.exhibition){const status=shoppingState(hallGroups.filter(g=>g.parsed.type==='exhibition')),r=locator.exhibition;
+    zones.push(`<button type="button" class="facility-zone exhibition shopping-${status.tone}" data-map-target="hall-${currentHall}-exhibition" aria-label="CPA 交流与展览区，${status.label}，点击查看详细地图" title="CPA 交流与展览区" style="left:${r.left}%;top:${r.top}%;width:${r.width}%;height:${r.height}%"><span>CPA 区</span>${navigationStatus(status)}</button>`);
+  }
+  return `<div class="facility-locator"><div class="facility-locator-head"><b>场馆设施与摊位区导航</b><span>颜色表示购物状态 · 点击进入</span></div><div class="facility-map">${neighbors}${exits}${zones.join('')}${pins}</div><div class="facility-locator-note">区域底色表示购物状态；箭头表示相邻馆或出口。设施与摊位区按官方图表达相对位置，不按实际距离比例绘制。</div></div>`
+}
+function mapMarkerHeading(g){return `<span class="map-marker-heading"><span class="map-marker-title">${esc(g.booth)}</span>${freebieStamp(g.booth,true)}</span>`}
+function renderSpecialMatrix(kind,gs,sectionId=''){
+  const cfg=SPECIAL_LAYOUTS[kind],candidates=gs.filter(g=>g.parsed.type===kind),used=new Set();
+  const keyOf=g=>g.parsed.number;
+  const boothButton=g=>`<button class="matrix-booth ${g.status}" data-booth="${esc(g.booth)}" title="${esc(g.booth)}">${mapMarkerHeading(g)}<span class="map-marker-meta"><small>${groupCountText(g)}</small></span></button>`;
+  const slots=cfg.slots.map(slot=>{const matches=candidates.filter(g=>!used.has(g.booth)&&slot.ids.includes(keyOf(g)));matches.forEach(g=>used.add(g.booth));return `<div class="matrix-slot ${slot.role==='zone-title'?'matrix-zone-title ':''}${matches.length?'has-wishlist':''}" style="grid-column:${slot.col}/span ${slot.span};grid-row:${slot.row}"><span class="matrix-slot-label">${esc(slot.label)}</span>${matches.map(boothButton).join('')}</div>`}).join('');
+  const unmapped=candidates.filter(g=>!used.has(g.booth));
+  return `<div class="special-zone matrix-zone map-target-section"${sectionId?` id="${esc(sectionId)}"`:''}><div class="special-head"><b>${esc(cfg.title)}</b><span class="sub">${esc(cfg.hint)}</span></div><div class="matrix-scroll"><div class="matrix-map ${cfg.className}">${slots}</div></div><div class="matrix-caption">灰色框为官方图中的编号组，彩色标记为 Wishlist 摊位；矩阵用于表达相对位置，不按实际距离比例绘制。</div>${unmapped.length?`<div class="matrix-unmapped"><span>暂未匹配到矩阵位置：</span>${unmapped.map(boothButton).join('')}</div>`:''}</div>`
+}
+function renderOverview(){
+  const all=groups(),card=document.getElementById('mapCard');
+  card.innerHTML=`<div class="hall-head"><div><h2>场馆总览</h2><div class="event-summary">福州 · 海峡国际会展中心 · 11.07–08</div></div></div>${shoppingLegend()}<div class="overview-wrap"><div class="venue-grid">${[9,4,3,2,1].map(h=>{const gs=all.filter(g=>g.parsed.hall===h),status=shoppingState(gs);return `<button class="venue-hall h${h} shopping-${status.tone}" data-overview-hall="${h}"><strong>${HALL_CONFIG[h].name}</strong><span class="venue-status"><i class="dot ${status.tone}"></i>${status.label}</span><span>${h===9?'企业摊位 · 医疗点 · 美食区':'↔ 左侧通往 9 号馆及出口'}</span></button>`}).join('')}</div><p class="overview-caption">按所提供场地图的上下、左右方向示意，不按距离比例绘制。点击进入各馆；3 号馆包含创摊一及 CPA 区，9 号馆为 CPC 企业区。</p></div>`;
+  card.querySelectorAll('[data-overview-hall]').forEach(b=>b.onclick=()=>{currentHall=Number(b.dataset.overviewHall);renderHallTabs();renderMap()});
+}
+function renderHorizontalBlock(block,gs){return `<div class="block-scroll"><div class="horizontal-aisles">${block.rows.map(row=>{const cap=block.rowCapacities?.[row]||block.capacity,half=cap/2;return `<div class="horizontal-row"><div class="aisle-letter">${row}</div><div class="horizontal-track upper"></div><div class="horizontal-track lower"></div><span class="horizontal-end start upper">${half}</span><span class="horizontal-end end upper">01</span><span class="horizontal-end start lower">${half+1}</span><span class="horizontal-end end lower">${cap}</span>${gs.filter(g=>g.parsed.type==='standard'&&g.parsed.row===row).map(g=>{const n=(g.parsed.start+g.parsed.end)/2,upper=n<=half,p=upper?(half-n)/(half-1):(n-half-1)/(half-1);return `<button class="map-marker ${g.status}" style="left:${24+p*310}px;top:${upper?45:115}px" data-booth="${esc(g.booth)}">${mapMarkerHeading(g)}<span class="map-marker-meta"><small>${groupCountText(g)}</small></span></button>`}).join('')}</div>`}).join('')}</div></div>`}
+function renderMap(){
+  if(currentHall==='overview'){renderOverview();return}
+  const cfg=HALL_CONFIG[currentHall]; const gs=groups().filter(g=>g.parsed.hall===currentHall); const pendingBooths=gs.filter(g=>g.status==='pending').length,doneBooths=gs.length-pendingBooths;
+  let body=`<div class="hall-head"><div><h2>${cfg.name}</h2></div><div class="hall-progress"><strong>${pendingBooths}</strong> 待去 · <strong>${doneBooths}</strong> 完成</div></div>`+
+    shoppingLegend()+
+    `<div class="map-note">${esc(cfg.facility)}。</div>`+renderFacilityLocator(cfg);
+  if(cfg.enterprise)body+=renderSpecialMatrix('enterprise',gs,`hall-${currentHall}-enterprise`);
+  for(const [blockIndex,block] of cfg.blocks.entries()){
+    if(block.orientation==='horizontal'){body+=`<div class="block-wrap map-target-section" id="hall-${currentHall}-block-${blockIndex}"><div class="block-title">${block.name}<span class="map-scroll-hint"> · 左右滑动查看整排</span></div>${renderHorizontalBlock(block,gs)}</div>`;continue}
+    body+=`<div class="block-wrap map-target-section" id="hall-${currentHall}-block-${blockIndex}"><div class="block-title">${block.name}<span class="map-scroll-hint"> · 左右滑动查看整排</span></div><div class="block-scroll"><div class="aisles">`;
+    for(const row of block.rows){
+      const rowGroups=gs.filter(g=>g.parsed.type==='standard'&&g.parsed.row===row);
+      const rowBlock={...block,capacity:block.rowCapacities?.[row]||block.capacity},numbers=aisleNumberLayout(rowBlock),layout=markerLayout(rowGroups,rowBlock);
+      body+=`<div class="aisle"><div class="aisle-letter">${row}</div><div class="aisle-line"></div><div class="aisle-end-label left head">${String(numbers.leftTop).padStart(2,'0')}</div><div class="aisle-end-label left tail">${String(numbers.leftBottom).padStart(2,'0')}</div><div class="aisle-end-label right head">${String(numbers.rightTop).padStart(2,'0')}</div><div class="aisle-end-label right tail">${String(numbers.rightBottom).padStart(2,'0')}</div>`;
+      for(const g of rowGroups){const placed=layout.get(g.booth),extra=g.parsed.end>g.parsed.start?' marker-range':'';body+=`<button class="map-marker ${g.status} side-${placed.side}${extra}" style="top:${placed.top}px" data-booth="${esc(g.booth)}" title="${esc(g.booth)}">${mapMarkerHeading(g)}<span class="map-marker-meta"><small>${groupCountText(g)}</small></span></button>`}
+      body+=`</div>`;
+    }
+    body+=`</div></div></div>`;
+  }
+  if(cfg.exhibition)body+=renderSpecialMatrix('exhibition',gs,`hall-${currentHall}-exhibition`);
+  if(cfg.special)body+=renderSpecialMatrix('creator',gs,`hall-${currentHall}-creator`);
+  const unknown=groups().filter(g=>!g.parsed.hall);if(unknown.length)body+=`<div class="map-unmatched">以下编号暂未匹配本届地图，清单仍保留：${unknown.map(g=>`<button data-booth="${esc(g.booth)}">${esc(g.booth)}</button>`).join('')}</div>`;
+  if(!gs.length)body+=`<div class="empty-hall">当前 Wishlist 在本馆没有摊位。</div>`;
+  const mapCard=document.getElementById('mapCard');mapCard.innerHTML=body;mapCard.querySelectorAll('[data-booth]').forEach(b=>b.onclick=()=>openBooth(b.dataset.booth));
+  mapCard.querySelectorAll('[data-neighbor-hall]').forEach(b=>b.onclick=()=>{currentHall=Number(b.dataset.neighborHall);renderHallTabs();renderMap()});
+  mapCard.querySelectorAll('[data-map-target]').forEach(b=>b.onclick=()=>{const target=document.getElementById(b.dataset.mapTarget);if(!target)return;target.classList.remove('map-section-focus');void target.offsetWidth;target.classList.add('map-section-focus');target.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>target.classList.remove('map-section-focus'),1400)});
+}
+
+function renderList(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase(),f=document.getElementById('statusFilter').value; let gs=groups().sort(boothSort);
+  if(f.startsWith('freebie-'))gs=gs.filter(g=>freebieAt(g.booth)&&(f==='freebie-all'||freebieAt(g.booth).status==='pending'));
+  else if(f!=='all')gs=gs.map(g=>({...g,items:g.items.filter(i=>i.status===f)})).filter(g=>g.items.length);
+  if(q)gs=gs.filter(g=>[g.booth,freebieAt(g.booth)?.condition,freebieAt(g.booth)?.circle,...g.items.flatMap(i=>[i.name,i.circle,i.source,i.type])].join(' ').toLowerCase().includes(q));
+  const el=document.getElementById('boothList'); if(!gs.length){el.innerHTML='<div class="empty-hall">没有符合条件的项目。</div>';return}
+  el.innerHTML=gs.map(g=>{const all=groups().find(x=>x.booth===g.booth),circle=circleOfGroup(all);const miss=g.items.filter(i=>!knownPrice(i)).length;const total=g.items.reduce((a,i)=>a+itemCost(i),0);return `<div class="card booth-card"><div class="booth-card-head" data-open-booth="${esc(g.booth)}"><div class="booth-id"><i class="status-pill ${all.status}"></i><span class="booth-title">${esc(g.booth)} ${freebieStamp(g.booth)}<span class="booth-circle">${esc(circle)}</span></span></div><div class="booth-meta">${g.items.length?g.items.length+'条 · '+(miss?miss+'待补价':money(total)):'无料摊位'}</div></div>${freebieAt(g.booth)?`<div class="freebie-list-note">${freebieLabel(freebieAt(g.booth).status)}${freebieAt(g.booth).condition?' · '+esc(freebieAt(g.booth).condition):''}</div>`:''}${g.items.map(i=>`<div class="swipe-item"><div class="swipe-trash" aria-hidden="true">${iconSvg('trash-2')}<span>垃圾桶</span></div><div class="item-row" data-swipe-row="${esc(i.id)}"><div><div class="item-name">${esc(i.name)}</div><div class="item-detail">${[i.source,i.type].filter(Boolean).map(esc).join(' · ')}</div></div><div class="item-actions"><input class="price-mini" data-price="${esc(i.id)}" type="number" min="0" placeholder="¥" value="${knownPrice(i)?Number(i.price):''}"><button class="status-mini ${i.status}" data-cycle="${esc(i.id)}">${statusLabel(i.status)}</button></div></div></div>`).join('')}</div>`}).join('');
+  bindSwipeRows(el);
+  el.querySelectorAll('[data-open-booth]').forEach(x=>x.onclick=()=>openBooth(x.dataset.openBooth));
+  el.querySelectorAll('[data-price]').forEach(x=>x.onchange=()=>{const i=state.items.find(i=>i.id===x.dataset.price);i.price=x.value===''?null:Number(x.value);saveState();renderList();renderMap()});
+  el.querySelectorAll('[data-cycle]').forEach(x=>x.onclick=()=>{const i=state.items.find(i=>i.id===x.dataset.cycle);i.status=i.status==='pending'?'purchased':i.status==='purchased'?'soldout':'pending';saveState();renderList();renderMap()});
+}
+
+function openBooth(booth){const g=groups().find(x=>x.booth===booth);if(!g)return;const p=g.parsed,circle=circleOfGroup(g);const bought=g.items.filter(i=>i.status==='purchased').length,sold=g.items.filter(i=>i.status==='soldout').length,pending=g.items.length-bought-sold;const total=g.items.filter(i=>i.status!=='soldout').reduce((a,i)=>a+itemCost(i),0);document.getElementById('sheetContent').innerHTML=`<div class="sheet-head"><div><h3>${esc(booth)} <span class="booth-circle">${esc(circle)}</span></h3><div class="sheet-summary">${p.hall?p.hall+'号馆 · ':''}${pending}待购 · ${bought}已购 · ${sold}完售 · 当前预计 ${money(total)}</div></div><button class="close" id="sheetClose">×</button></div>`+freebieEditor(booth)+g.items.map(i=>`<div class="sheet-item"><div class="sheet-name-row" data-name-row="${i.id}"><div class="sheet-name-display">${esc(i.name)}</div><button type="button" class="sheet-name-edit" data-edit-name="${i.id}" aria-label="编辑商品名">${iconSvg('pencil')}</button><input class="sheet-name-input" type="text" maxlength="200" aria-label="商品名" data-sheet-name="${i.id}" value="${esc(i.name)}"></div><div class="item-detail">${[i.source,i.type,i.prepStatus].filter(Boolean).map(esc).join(' · ')}</div><div class="status-actions"><button class="status-btn pending ${i.status==='pending'?'active':''}" data-set-status="pending" data-id="${i.id}">尚未购入</button><button class="status-btn purchased ${i.status==='purchased'?'active':''}" data-set-status="purchased" data-id="${i.id}">✓ 已购入</button><button class="status-btn soldout ${i.status==='soldout'?'active':''}" data-set-status="soldout" data-id="${i.id}">× 已完售</button></div><div class="sheet-price"><input type="number" min="0" step="1" placeholder="价格 ¥" data-sheet-price="${i.id}" value="${knownPrice(i)?Number(i.price):''}"><input class="qty" type="number" min="1" step="1" data-sheet-qty="${i.id}" value="${Number(i.qty)||1}"></div></div>`).join('')+`<div class="sheet-footer"><button class="primary" id="buyAll">全部标为已购</button><button class="secondary" id="sheetDone">完成</button></div>`;
+  bindFreebieEditor(booth);
+  document.getElementById('buyAll').hidden=!g.items.length;
+  document.getElementById('sheetBackdrop').classList.add('open');document.getElementById('sheetClose').onclick=closeSheet;document.getElementById('sheetDone').onclick=closeSheet;
+  document.querySelectorAll('[data-set-status]').forEach(b=>b.onclick=()=>{const i=state.items.find(i=>i.id===b.dataset.id);i.status=b.dataset.setStatus;saveState();openBooth(booth);renderMap();if(currentView==='list')renderList()});
+  document.querySelectorAll('[data-edit-name]').forEach(b=>b.onclick=()=>{const row=b.closest('[data-name-row]'),input=row.querySelector('[data-sheet-name]');row.classList.add('editing');input.focus();input.select()});
+  document.querySelectorAll('[data-sheet-name]').forEach(x=>{x.onchange=()=>{const i=state.items.find(i=>i.id===x.dataset.sheetName),next=x.value.trim(),row=x.closest('[data-name-row]');if(!next){x.value=i.name;row.classList.remove('editing');toast('商品名不能为空');return}if(next===i.name){row.classList.remove('editing');return}i.name=next;row.querySelector('.sheet-name-display').textContent=next;row.classList.remove('editing');saveState();renderMap();if(currentView==='list')renderList();toast('商品名已更新')};x.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();x.blur()}else if(e.key==='Escape'){e.preventDefault();const i=state.items.find(i=>i.id===x.dataset.sheetName);x.value=i.name;x.closest('[data-name-row]').classList.remove('editing')}}});
+  document.querySelectorAll('[data-sheet-price]').forEach(x=>x.onchange=()=>{const i=state.items.find(i=>i.id===x.dataset.sheetPrice);i.price=x.value===''?null:Number(x.value);saveState();openBooth(booth);if(currentView==='list')renderList()});
+  document.querySelectorAll('[data-sheet-qty]').forEach(x=>x.onchange=()=>{const i=state.items.find(i=>i.id===x.dataset.sheetQty);i.qty=Math.max(1,Number(x.value)||1);saveState();openBooth(booth);if(currentView==='list')renderList()});
+  document.getElementById('buyAll').onclick=()=>{g.items.forEach(i=>{if(i.status==='pending')i.status='purchased'});saveState();renderMap();if(currentView==='list')renderList();openBooth(booth)};
+}
+function closeSheet(){document.getElementById('sheetBackdrop').classList.remove('open')}
+document.getElementById('sheetBackdrop').addEventListener('click',e=>{if(e.target.id==='sheetBackdrop')closeSheet()});
+
+const settingsBackdrop=document.getElementById('settingsBackdrop'),settingsBtn=document.getElementById('settingsBtn'),markerOpacityInput=document.getElementById('markerOpacity');
+function openSettings(){applyFreebieOpacity(state.freebieOpacity);applyMarkerOpacity(state.markerOpacity);renderSettlement();renderTrash();settingsBackdrop.classList.add('open');settingsBackdrop.setAttribute('aria-hidden','false');settingsBtn.setAttribute('aria-expanded','true');setTimeout(()=>markerOpacityInput.focus(),0)}
+function closeSettings(){if(!settingsBackdrop.classList.contains('open'))return;saveState();settingsBackdrop.classList.remove('open');settingsBackdrop.setAttribute('aria-hidden','true');settingsBtn.setAttribute('aria-expanded','false');settingsBtn.focus()}
+document.getElementById('freebieOpacity').oninput=e=>applyFreebieOpacity(e.target.value);document.getElementById('freebieOpacity').onchange=()=>saveState();
+settingsBtn.onclick=openSettings;document.getElementById('settingsClose').onclick=closeSettings;document.getElementById('settingsDone').onclick=closeSettings;settingsBackdrop.addEventListener('click',e=>{if(e.target===settingsBackdrop)closeSettings()});markerOpacityInput.oninput=e=>applyMarkerOpacity(e.target.value);markerOpacityInput.onchange=e=>{applyMarkerOpacity(e.target.value);saveState()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('battleDialog').open)closeSettings()});
+document.getElementById('settlementPreview').onclick=()=>openBattleReport(false);
+document.getElementById('settlementGenerate').onclick=()=>openBattleReport(true);
+
+
+function setView(v){currentView=v;document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(v+'View').classList.add('active');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.view===v));if(v==='map'){renderHallTabs();renderMap()}if(v==='list')renderList()}
+document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.getElementById('searchInput').oninput=renderList;document.getElementById('statusFilter').onchange=renderList;
+
+document.getElementById('addBtn').onclick=()=>{const booth=document.getElementById('addBooth').value.trim(),name=document.getElementById('addName').value.trim(),circle=document.getElementById('addCircle').value.trim();if(!booth||!name){toast('请填写摊位号和展品名称');return}state.items.push({id:uid(),boothRaw:booth,name,type:'',heat:null,prepStatus:'',source:'',circle,price:document.getElementById('addPrice').value===''?null:Number(document.getElementById('addPrice').value),qty:Math.max(1,Number(document.getElementById('addQty').value)||1),status:'pending',note:''});saveState();document.getElementById('addName').value='';document.getElementById('addPrice').value='';toast('已加入 Wishlist');const p=parseBooth(booth);if(p.hall)currentHall=p.hall;setView('map')};
+
+
+document.getElementById('addFreebieBtn').onclick=()=>{
+  const booth=document.getElementById('freebieBooth').value.trim(),circle=document.getElementById('freebieCircle').value.trim(),condition=document.getElementById('freebieNote').value.trim();
+  if(!booth){toast('请填写无料摊位号');return}
+  const previous=freebieAt(booth);setFreebie(booth,{status:previous?.status||'pending',circle:circle||previous?.circle||'',condition:condition||previous?.condition||''});
+  saveState();renderMap();setView('list');document.getElementById('statusFilter').value='all';document.getElementById('searchInput').value='';renderList();openBooth(booth);
+  for(const id of ['freebieBooth','freebieCircle','freebieNote'])document.getElementById(id).value='';toast('无料摊位已保存');
+};
+
+document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='CPT-F_wishlist_backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+document.getElementById('importJsonBtn').onclick=()=>document.getElementById('jsonInput').click();document.getElementById('jsonInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const s=JSON.parse(await f.text());if(!s||!Array.isArray(s.items))throw new Error();if(s.eventId&&s.eventId!==EVENT_ID){toast('这是其他场次的备份，请在对应场次页面恢复');e.target.value='';return}state=normalizeState(s);saveState();renderMap();renderList();renderTrash();toast('JSON 备份已恢复')}catch(err){toast('无法读取该 JSON 备份')}e.target.value=''};
+document.getElementById('resetBtn').onclick=()=>{if(!confirm('确定恢复为初始 Wishlist？当前价格、购买状态、无料记录、结算和垃圾桶都会被清除。'))return;state={items:cloneSeed(),trash:[],version:STATE_VERSION,eventId:EVENT_ID,demoSeedsInitialized:true,demoFreebieInitialized:true,freebieOpacity:state.freebieOpacity,markerOpacity:state.markerOpacity,settlement:null,freebies:cloneSeedFreebies()};saveState();renderMap();renderList();renderTrash();toast('已恢复初始 Wishlist')};
+
+// ---- 极简 OOXML/XLSX 读取器：为了让单文件原型可完全离线导入 ----
+function u16(b,o){return b[o]|(b[o+1]<<8)} function u32(b,o){return (b[o]|(b[o+1]<<8)|(b[o+2]<<16)|(b[o+3]<<24))>>>0}
+async function unzipEntries(ab){const b=new Uint8Array(ab);if(!(b[0]===0x50&&b[1]===0x4b))throw new Error('legacy-xls');let eocd=-1;for(let i=b.length-22;i>=Math.max(0,b.length-65557);i--){if(u32(b,i)===0x06054b50){eocd=i;break}}if(eocd<0)throw new Error('zip');const total=u16(b,eocd+10),cdOffset=u32(b,eocd+16);let p=cdOffset;const out={};for(let k=0;k<total;k++){if(u32(b,p)!==0x02014b50)throw new Error('zip-cd');const method=u16(b,p+10),csize=u32(b,p+20),fnlen=u16(b,p+28),exlen=u16(b,p+30),comlen=u16(b,p+32),lhoff=u32(b,p+42);const name=new TextDecoder().decode(b.slice(p+46,p+46+fnlen));if(u32(b,lhoff)!==0x04034b50)throw new Error('zip-local');const lfn=u16(b,lhoff+26),lex=u16(b,lhoff+28),start=lhoff+30+lfn+lex,comp=b.slice(start,start+csize);let data;if(method===0)data=comp;else if(method===8){const ds=new DecompressionStream('deflate-raw');data=new Uint8Array(await new Response(new Blob([comp]).stream().pipeThrough(ds)).arrayBuffer())}else throw new Error('zip-method');out[name]=data;p+=46+fnlen+exlen+comlen}return out}
+function decodeXml(s){return s.replace(/&#x([0-9a-f]+);/gi,(_,h)=>String.fromCodePoint(parseInt(h,16))).replace(/&#(\d+);/g,(_,d)=>String.fromCodePoint(parseInt(d,10))).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&')}
+function parseShared(xml){const a=[];for(const m of xml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)){let t='';for(const z of m[1].matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g))t+=decodeXml(z[1]);a.push(t)}return a}
+function colIdx(ref){let n=0;for(const c of ref.match(/[A-Z]+/)[0])n=n*26+c.charCodeAt(0)-64;return n-1}
+function parseSheet(xml,shared=[]){const rows=[];for(const rm of xml.matchAll(/<row\b[^>]*>([\s\S]*?)<\/row>/g)){const row=[];for(const cm of rm[1].matchAll(/<c\b([^>]*)>([\s\S]*?)<\/c>/g)){const attrs=cm[1],body=cm[2],r=(attrs.match(/\br="([A-Z]+\d+)"/)||[])[1];if(!r)continue;const i=colIdx(r),type=(attrs.match(/\bt="([^"]+)"/)||[])[1]||'';let v='';if(type==='inlineStr'){const ts=[...body.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)];v=ts.map(x=>decodeXml(x[1])).join('')}else{const vm=body.match(/<v\b[^>]*>([\s\S]*?)<\/v>/);if(vm){v=decodeXml(vm[1]);if(type==='s')v=shared[Number(v)]??''}}row[i]=v}rows.push(row)}return rows}
+async function readWishlistWorkbook(file){const z=await unzipEntries(await file.arrayBuffer()),td=new TextDecoder(),shared=z['xl/sharedStrings.xml']?parseShared(td.decode(z['xl/sharedStrings.xml'])):[],sheetPath=Object.keys(z).find(k=>/^xl\/worksheets\/sheet\d+\.xml$/.test(k));if(!sheetPath)throw new Error('sheet');const rows=parseSheet(td.decode(z[sheetPath]),shared);const hi=rows.findIndex(r=>r.includes('摊位号')&&r.includes('展品名称'));if(hi<0)throw new Error('header');const hdr=rows[hi].map(x=>String(x||'').trim()),idx={};hdr.forEach((h,i)=>idx[h]=i);const val=(r,k)=>String(r[idx[k]]??'').trim();return rows.slice(hi+1).filter(r=>val(r,'摊位号')&&val(r,'展品名称')).map(r=>({boothRaw:val(r,'摊位号'),name:val(r,'展品名称'),type:val(r,'类型'),heat:Number(val(r,'热度'))||null,prepStatus:val(r,'筹备状态'),source:val(r,'原作'),circle:val(r,'社团名称')}))}
+function mergeImported(rows){let added=0,updated=0;for(const r of rows){const ex=state.items.find(i=>i.boothRaw===r.boothRaw&&i.name===r.name);if(ex){Object.assign(ex,{type:r.type,heat:r.heat,prepStatus:r.prepStatus,source:r.source,circle:r.circle});updated++}else{state.items.push({id:uid(),...r,price:null,qty:1,status:'pending',note:''});added++}}saveState();return {added,updated}}
+function showUnmappedImportWarning(rows){
+  const missing=new Map();
+  for(const row of rows){if(parseBooth(row.boothRaw).hall===null){const booth=String(row.boothRaw||'未填写').trim();missing.set(booth,(missing.get(booth)||0)+1)}}
+  if(!missing.size)return;
+  const dialog=document.getElementById('importWarningDialog'),list=document.getElementById('importWarningList');
+  list.replaceChildren();
+  for(const [booth,count] of missing){const li=document.createElement('li');li.textContent=`${booth}（${count} 条）`;list.append(li)}
+  if(!dialog.open)dialog.showModal();
+}
+document.getElementById('excelInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const rows=await readWishlistWorkbook(f);const r=mergeImported(rows);renderMap();renderList();toast(`导入完成：新增 ${r.added}，更新 ${r.updated}`);showUnmappedImportWarning(rows)}catch(err){console.error(err);toast(err.message==='legacy-xls'?'这是旧式二进制 .xls，当前版本暂不支持':'Excel 读取失败，请检查表头和文件格式')}e.target.value=''};
+
+applyFreebieOpacity(state.freebieOpacity);applyMarkerOpacity(state.markerOpacity);renderStats();renderHallTabs();renderMap();
+</script>
+</body>
+</html>
